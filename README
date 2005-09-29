@@ -1,0 +1,65 @@
+NAME
+    Text::Hatena - Perl extension for formating text with Hatena Style.
+
+SYNOPSIS
+      use Text::Hatena;
+
+      my $parser = Text::Hatena->new(
+        permalink => 'http://www.example.com/entry/123',
+      );
+      $parser->parse($text);
+      my $html = $parser->html;
+
+DESCRIPTION
+    Text::Hatena parses text and generate html string with Hatena Style.
+    Hatena Style is a set of text syntax which is originally used in Hatena
+    Diary (http://d.hatena.ne.jp/).
+
+    You can get html string from simple text syntax like Wiki.
+
+METHODS
+    Here are common methods of Text::Hatena.
+
+    new
+          $parser = Text::Hatena->new;
+          $parser = Text::Hatena->new(
+            permalink => 'http://www.example.com/entry/123',
+            ilevel => 1,
+            invalidnode => [qw(h4 h5)],
+            sectionanchor => '@',
+          );
+
+        creates a instance of Text::Hatena.
+
+        "permalink" is the uri of your document. It is used in H3 section
+        anchor.
+
+        "ilevel" is the base level of indent.
+
+        "invalidnode" is array reference of invalid nodes. The node which is
+        in the array will be skipped.
+
+        "sectionanchor" is the string of H3 section anchor.
+
+    parse
+          $parser->parse($text);
+
+        parses text and generate html.
+
+    html
+          $html = $parser->html;
+
+        returns html string which has generated.
+
+SEE ALSO
+    http://d.hatena.ne.jp/ (Japanese)
+
+AUTHOR
+    Junya Kondo, <jkondo@hatena.ne.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Junya Kondo
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
