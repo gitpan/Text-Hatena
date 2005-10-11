@@ -3,7 +3,7 @@ use strict;
 use Text::Hatena::Context;
 use Text::Hatena::BodyNode;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
     my $class = shift;
@@ -45,7 +45,7 @@ __END__
 
 =head1 NAME
 
-Text::Hatena - Perl extension for formating text with Hatena Style.
+Text::Hatena - Perl extension for formatting text with Hatena Style.
 
 =head1 SYNOPSIS
 
@@ -59,11 +59,11 @@ Text::Hatena - Perl extension for formating text with Hatena Style.
 
 =head1 DESCRIPTION
 
-Text::Hatena parses text and generate html string with Hatena Style.
+Text::Hatena parses text with Hatena Style and generates html string.
 Hatena Style is a set of text syntax which is originally used in 
 Hatena Diary (http://d.hatena.ne.jp/).
 
-You can get html string from simple text syntax like Wiki.
+You can get html string from simple text with syntax like Wiki.
 
 =head1 METHODS
 
@@ -81,13 +81,13 @@ Here are common methods of Text::Hatena.
     sectionanchor => '@',
   );
 
-creates a instance of Text::Hatena.
+creates an instance of Text::Hatena.
 
 C<permalink> is the uri of your document. It is used in H3 section anchor.
 
-C<ilevel> is the base level of indent.
+C<ilevel> is the base indent level.
 
-C<invalidnode> is array reference of invalid nodes. The node which is in the array will be skipped.
+C<invalidnode> is an array reference of invalid nodes. The node in the array will be skipped.
 
 C<sectionanchor> is the string of H3 section anchor.
 
@@ -95,13 +95,13 @@ C<sectionanchor> is the string of H3 section anchor.
 
   $parser->parse($text);
 
-parses text and generate html.
+parses text and generates html.
 
 =item html
 
   $html = $parser->html;
 
-returns html string which has generated.
+returns html string generated.
 
 =back
 

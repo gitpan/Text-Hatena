@@ -8,7 +8,7 @@ sub init {
     $self->{endpattern} = qr/^<<$/;
     $self->{childnode} = [qw(h4 h5 blockquote dl list pre superpre table)];
     $self->{startstring} = qq|<blockquote>|;
-    $self->{endstring} = qq|</blockuote>|;
+    $self->{endstring} = qq|</blockquote>|;
 }
 
 sub parse {
