@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 45;
+use Test::More tests => 47;
 BEGIN { use_ok('Text::Hatena') };
 
 my $base = 'http://d.hatena.ne.jp/jkondo/';
@@ -14,7 +14,7 @@ my $p = Text::Hatena->new(
 	sectionanchor => $sa,
 );
 ok (ref($p) eq 'Text::Hatena');
-my ($text,$html,@a);
+my ($text,$html,$html2,@a);
 
 @a = ('title','body');
 $text = &h3text(@a);
@@ -125,6 +125,51 @@ $p->parse($text);
 $html = $p->html;
 ok ($html =~ m!$a[0]<span class="footnote"><a.+?>\*1</a></span>$a[2]!);
 ok ($html =~ m!<p class="footnote"><a.+?>\*1</a>.+$a[1]</p>!s);
+
+# tagline
+
+$text = <<END;
+><div>no paragraph line</div><
+paragraph line
+END
+
+$html2 = <<END;
+<div class="section">
+	<div>no paragraph line</div>
+	<p>paragraph line</p>
+</div>
+END
+
+$p->parse($text);
+$html = $p->html;
+chomp $html2;
+ok ($html eq $html2);
+
+# tag
+my $text = <<END;
+><blockquote>
+no paragraph
+lines
+</blockquote><
+paragraph
+lines
+END
+
+$html2 = <<END;
+<div class="section">
+	<blockquote>
+		no paragraph
+		lines
+	</blockquote>
+	<p>paragraph</p>
+	<p>lines</p>
+</div>
+END
+
+$p->parse($text);
+$html = $p->html;
+chomp $html2;
+ok ($html eq $html2);
 
 sub h3text {
 	return <<END;

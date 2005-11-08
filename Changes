@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Hatena.
 
+0.03  Wed Nov 9
+	- added taglines node, tag node, cdata node.
+	- added Text::Hatena Syntax description.
+	- fixed pre node ("|<" at line end become works). 
+
 0.02  Fri Oct 8
 	- fixed typo.
 

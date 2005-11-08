@@ -12,10 +12,13 @@ use Text::Hatena::SuperpreNode;
 use Text::Hatena::TableNode;
 use Text::Hatena::PNode;
 use Text::Hatena::BrNode;
+use Text::Hatena::TaglineNode;
+use Text::Hatena::TagNode;
+use Text::Hatena::CDataNode;
 
 sub init {
     my $self = shift;
-    $self->{childnode} = [qw(h5 h4 h3 blockquote dl list pre superpre table)];
+    $self->{childnode} = [qw(h5 h4 h3 blockquote dl list pre superpre table tagline tag)];
     $self->{startstring} = qq|<div class="section">|;
     $self->{endstring} = qq|</div>|;
 }
@@ -68,6 +71,8 @@ sub _findnode {
     );
     if (!length($l)) {
         return Text::Hatena::BrNode->new(%nodeoption);
+    } elsif ($self->{context}->noparagraph) {
+        return Text::Hatena::CDataNode->new(%nodeoption);
     } else {
         return Text::Hatena::PNode->new(%nodeoption);
     }

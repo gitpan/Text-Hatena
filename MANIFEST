@@ -20,5 +20,8 @@ lib/Text/Hatena/PreNode.pm
 lib/Text/Hatena/SectionNode.pm
 lib/Text/Hatena/SuperpreNode.pm
 lib/Text/Hatena/TableNode.pm
+lib/Text/Hatena/TaglineNode.pm
+lib/Text/Hatena/TagNode.pm
 lib/Text/Hatena/Text.pm
+lib/Text/Hatena/CDataNode.pm
 META.yml                                 Module meta-data (added by MakeMaker)

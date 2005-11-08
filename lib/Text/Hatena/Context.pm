@@ -15,6 +15,7 @@ sub new {
         footnotes => [],
         sectioncount => 0,
         syntaxrefs => [],
+	nopragraph => 0,
     };
     bless $self,$class;
     $self->init;
@@ -77,6 +78,12 @@ sub syntaxpattern {
     my $self = shift;
     $self->{syntaxpattern} = $_[0] if $_[0];
     $self->{syntaxpattern};
+}
+
+sub noparagraph {
+    my $self = shift;
+    $self->{noparagraph} = $_[0] if defined $_[0];
+    $self->{noparagraph};
 }
 
 sub sectioncount { $_[0]->{sectioncount}; }

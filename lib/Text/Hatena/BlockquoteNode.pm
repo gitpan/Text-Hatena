@@ -6,7 +6,7 @@ sub init {
     my $self = shift;
     $self->{pattern} = qr/^>>$/;
     $self->{endpattern} = qr/^<<$/;
-    $self->{childnode} = [qw(h4 h5 blockquote dl list pre superpre table)];
+    $self->{childnode} = [qw(h4 h5 blockquote dl list pre superpre table tagline tag)];
     $self->{startstring} = qq|<blockquote>|;
     $self->{endstring} = qq|</blockquote>|;
 }
