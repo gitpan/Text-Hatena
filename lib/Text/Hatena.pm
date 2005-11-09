@@ -3,7 +3,7 @@ use strict;
 use Text::Hatena::Context;
 use Text::Hatena::BodyNode;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
     my $class = shift;
@@ -117,25 +117,60 @@ Basically each line becomes a paragraph. If you want to force a newline in a par
 
 You can add footnotes by using double parentheses.
 
+  Hatena is in Tokyo((The biggest city in Japan)).
+
 Text::Hatena treats a blank line as the end of a block. A blank line after a paragraph does not affect the output. Two blank lines are translated into a line break, three blank lines are translated into two line breaks and so on.
+
+To stop generating paragraphs automatically, start a line with >< (greater-than sign and less-than sign). The first > (greater-than sign) will be omitted. If you end a line with ><, it will stop. The last < (less-than sign) will be omitted.
+
+  ><div class="foo">A div block without paragraph.</div><
+
+  ><form action="foo.cgi" method="put">
+  To insert a from, write as you see here.
+  <input type="text" name="a" />
+  <input type="submit" />
+  </form><
 
 =item Headlines
 
 To create a section headline, start a line with a star followed by an anchor, a star, some tags of categories and a section title. An anchor and tags are optional. If you omit an anchor, Text::Hatena generates it automatically.
 
+  *A line with a star becomes section headline
+  *sa*You can specify a string for anchor name
+  *[foo][bar]You can specify some tags of categories
+  *sa*[foo][bar]You can mix them
+
 More stars mean deeper levels of headlines. You can use up to three stars for headlines.
+
+  **Start a line with two stars to create a 4th level headline
+  ***Start a line with three stars to create a 5th level headline.
 
 =item Lists and Tables
 
 Text::Hatena supports ordered and unordered lists. Start every line with a minus (-) for unordered lists or a plus (+) for ordered ones. More marks mean deeper levels. You can show the end of the lists by a blank line.
 
+  -Start a line with minuses to create an unordered list item.
+
+  +Start a line with pluses to create an ordered list item.
+  ++They can be nested.
+
 Text::Hatena supports definition lists. Start every line with a colon followed by a term, a colon, and a description.
 
+  :term:description
+
 You can create tables by using a simple syntax. Table rows have to start and end with a vertical bar (|). Separete every cell with a vertical bar (|). To turn cells into headers, begin them with a star.
+
+  |*header1|*header2|
+  |colum1|colum2|
 
 =item Blockquotes
 
 To make a blockquote, enclose line(s) with >> (double greater-than sign) and << (double less-than sign). Marks should be placed in separate lines; don't start quoting line(s) with >> or end them with <<. Blockquotes may be nested.
+
+  >>
+  To make a blockquote, enclose line(s) with >> (double greater-than sign)
+  and << (double less-than sign).
+  <<
 
 =item Preformatted texts
 
@@ -143,13 +178,35 @@ To make a preformatted text, enclose line(s) with >| (a greater-than sign follow
 
 Every >| should be placed in separate lines; don't start preformatted line(s) with >|. But some preformatted texts may be closed by |< after the last lines without separating lines.
 
+  >|
+  To make a preformatted text, enclose line(s) with >|
+  (a greater-than sign followed by a vertical bar) and |<
+  (a vertical var followed by a less-than sign).
+  |<
+
+This also works well.
+
+  >|
+  To make a preformatted text, enclose line(s) with >|
+  (a greater-than sign followed by a vertical bar) and |<
+  (a vertical var followed by a less-than sign).|<
+
 To encode special characters into HTML entities, use >|| and ||< for >| and |<. The characters to be replaced are less-than signs (<), greater-than signs (>), double quotes ("), and ampersands (&).
+
+  >||
+  To encode special characters into HTML entities,
+  use >|| and ||< for >| and |<.
+  ||<
 
 =back
 
 =head1 SEE ALSO
 
 http://d.hatena.ne.jp/ (Japanese)
+
+=head1 CREDITS
+
+Thanks to id:tociyuki E<lt>http://d.hatena.ne.jp/tociyuki/E<gt> for helping some implementations and writing syntax guide. Thanks to id:charsbar E<lt>http://d.hatena.ne.jp/charsbar/E<gt> for helping to refine the guide.
 
 =head1 AUTHOR
 

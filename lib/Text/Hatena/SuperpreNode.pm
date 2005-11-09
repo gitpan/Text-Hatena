@@ -10,4 +10,16 @@ sub init {
     $self->{endstring} = qq|</pre>|;
 }
 
+sub escape_pre {
+    my $self = shift;
+    my $s = shift;
+    $s =~ s/\&/\&amp;/g;
+    $s =~ s/</\&lt;/g;
+    $s =~ s/>/\&gt;/g;
+    $s =~ s/"/\&quot;/g;
+    $s =~ s/\'/\&#39;/g;
+    $s =~ s/\\/\&#92;/g;
+    return $s;
+}
+
 1;

@@ -26,9 +26,11 @@ sub parse {
             $c->shiftline;
             last;
         }
-        $c->htmllines($c->shiftline);
+        $c->htmllines($self->escape_pre($c->shiftline));
     }
     $c->htmllines($x . $self->{endstring});
 }
+
+sub escape_pre { $_[1] }
 
 1;
