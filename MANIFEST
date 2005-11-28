@@ -24,4 +24,5 @@ lib/Text/Hatena/TaglineNode.pm
 lib/Text/Hatena/TagNode.pm
 lib/Text/Hatena/Text.pm
 lib/Text/Hatena/CDataNode.pm
+lib/Text/Hatena/HTMLFilter.pm
 META.yml                                 Module meta-data (added by MakeMaker)

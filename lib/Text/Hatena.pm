@@ -2,18 +2,40 @@ package Text::Hatena;
 use strict;
 use Text::Hatena::Context;
 use Text::Hatena::BodyNode;
+use Text::Hatena::FootnoteNode;
+use Text::Hatena::HTMLFilter;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my $class = shift;
     my %args = @_;
     my $self = {
+	html => '',
         baseuri => $args{baseuri} || '',
         permalink => $args{permalink} || '',
         ilevel => $args{ilevel} || 0, # level of default indent
         invalidnode => $args{invalidnode} || [],
         sectionanchor => $args{sectionanchor} || 'o-',
+	texthandler => $args{texthandler} || sub {
+	    my ($text, $c) = @_;
+	    my $p = $c->permalink;
+	    $text =~ s!
+		\(\((.+?)\)\)
+	    !
+                my ($note,$pre,$post) = ($1,$`,$');
+                if ($pre =~ /\)$/ && $post =~ /^\(/) {
+                    "(($note))";
+                } else {
+                    my $notes = $c->footnotes($note);
+                    my $num = $#$notes + 1;
+                    $note =~ s/<.*?>//g;
+                    $note =~ s/\&/\&amp\;/g;
+                    qq|<span class="footnote"><a href="$p#f$num" title="$note" name="fn$num">*$num</a></span>|;
+                }
+	    !egox;
+	    return $text;
+	},
     };
     bless $self, $class;
 }
@@ -27,18 +49,33 @@ sub parse {
         permalink => $self->{permalink},
         invalidnode => $self->{invalidnode},
         sectionanchor => $self->{sectionanchor},
+	texthandler => $self->{texthandler},
     );
+    my $c = $self->{context};
     my $node = Text::Hatena::BodyNode->new(
-        context => $self->{context},
+        context => $c,
         ilevel => $self->{ilevel},
     );
     $node->parse;
+    my $parser = Text::Hatena::HTMLFilter->new(
+	context => $c,
+    );
+    $parser->parse($c->html);
+    $self->{html} = $parser->html;
+
+    if (@{$c->footnotes}) {
+        my $node = Text::Hatena::FootnoteNode->new(
+            context => $c,
+            ilevel => $self->{ilevel},
+        );
+        $node->parse;
+	$self->{html} .= "\n";
+	$self->{html} .= $node->html;
+    }
 }
 
-sub html {
-    my $self = shift;
-    $self->{context}->html;
-}
+sub html { $_[0]->{html}; }
+
 
 1;
 __END__
@@ -204,13 +241,10 @@ To encode special characters into HTML entities, use >|| and ||< for >| and |<. 
 
 http://d.hatena.ne.jp/ (Japanese)
 
-=head1 CREDITS
-
-Thanks to id:tociyuki E<lt>http://d.hatena.ne.jp/tociyuki/E<gt> for helping some implementations and writing syntax guide. Thanks to id:charsbar E<lt>http://d.hatena.ne.jp/charsbar/E<gt> for helping to refine the guide.
-
 =head1 AUTHOR
 
 Junya Kondo, E<lt>jkondo@hatena.ne.jpE<gt>
+id:ticiyuki, E<lt>http://d.hatena.ne.jp/tociyuki/E<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

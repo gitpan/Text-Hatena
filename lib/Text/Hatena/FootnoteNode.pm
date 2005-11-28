@@ -9,8 +9,9 @@ sub parse {
     @{$c->footnotes} or return;
     my $t = "\t" x $self->{ilevel};
     my $p = $c->permalink;
+    $self->{html} = '';
 
-    $c->htmllines(qq|$t<div class="footnote">|);
+    $self->{html} .= qq|$t<div class="footnote">\n|;
     my $i;
     my $text = Text::Hatena::Text->new(context => $c);
     for my $note (@{$c->footnotes}) {
@@ -19,9 +20,11 @@ sub parse {
         my $l = qq|$t\t<p class="footnote"><a href="$p#fn$i" name="f$i">*$i</a>: |
             . $text->html
             . qq|</p>|;
-        $c->htmllines($l);
+        $self->{html} .= "$l\n";
     }
-    $c->htmllines(qq|$t</div>|);
+    $self->{html} .= qq|$t</div>\n|;
 }
+
+sub html { $_[0]->{html}; }
 
 1;

@@ -10,6 +10,7 @@ sub new {
         permalink => $args{permalink},
         invalidnode => $args{invalidnode},
         sectionanchor => $args{sectionanchor},
+	texthandler => $args{texthandler},
         htmllines => [],
         html => '',
         footnotes => [],
@@ -93,5 +94,6 @@ sub baseuri { $_[0]->{baseuri}; }
 sub permalink { $_[0]->{permalink}; }
 sub invalidnode { $_[0]->{invalidnode}; }
 sub sectionanchor { $_[0]->{sectionanchor}; }
+sub texthandler { $_[0]->{texthandler}; }
 
 1;

@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 47;
+use Test::More tests => 18;
 BEGIN { use_ok('Text::Hatena') };
 
 my $base = 'http://d.hatena.ne.jp/jkondo/';
@@ -16,115 +16,276 @@ my $p = Text::Hatena->new(
 ok (ref($p) eq 'Text::Hatena');
 my ($text,$html,$html2,@a);
 
-@a = ('title','body');
-$text = &h3text(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ /<h3>/);
-ok ($html =~ /<div class="section">/);
-ok ($html =~ /\Q$perma\E/);
-ok ($html =~ m!<span class="sanchor">\Q$sa\E</span>!);
-ok ($html =~ /$a[0]/);
-ok ($html =~ m!<p>$a[1]</p>!);
+# h3
+$text = <<END;
+*title
+body
+END
 
-@a = (1234567890);
-$text = &h3timetext(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ /#$a[0]/);
-ok ($html =~ /name="$a[0]"/);
-ok ($html =~ m!<span class="timestamp">08:31</span>!);
+$html2 = <<END;
+<div class="section">
+	<h3><a href="http://d.hatena.ne.jp/jkondo/20050906#p1" name="p1"><span class="sanchor">sa</span></a> title</h3>
+	<p>body</p>
+</div>
+END
 
-@a = ('hobby');
-$text = &h3cattext(@a);
 $p->parse($text);
 $html = $p->html;
-ok ($html =~ /#$a[0]/);
-ok ($html =~ /name="$a[0]"/);
-ok ($html =~ m!\[<a[^>]+>$a[0]</a>\]!i);
+chomp $html2;
 
-@a = ('h4title');
-$text = &h4text(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ m!<h4>$a[0]</h4>!);
+ok ($html eq $html2);
 
-@a = ('h5title');
-$text = &h5text(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ m!<h5>$a[0]</h5>!);
+# h3time
+$text = <<END;
+*1234567890*record time
+remember time.
+END
 
-@a = ('quoted');
-$text = &blockquotetext(@a);
 $p->parse($text);
 $html = $p->html;
-ok ($html =~ m!<blockquote>!);
-ok ($html =~ m!<p>$a[0]</p>!);
 
-@a = ('cinnamon', 'dog');
-$text = &dltext(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ m!<dl>!);
-ok ($html =~ m!<dt>$a[0]</dt>!);
-ok ($html =~ m!<dd>$a[1]</dd>!);
+$html2 = <<END;
+<div class="section">
+	<h3><a href="http://d.hatena.ne.jp/jkondo/20050906#1234567890" name="1234567890"><span class="sanchor">sa</span></a> record time</h3> <span class="timestamp">08:31</span>
+	<p>remember time.</p>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
 
-@a = ('komono', 'kyoto', 'shibuya');
-$text = &ultext(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ m!<ul>!);
-ok ($html =~ m!<li>$a[0]</li>!);
-ok ($html =~ m!<li>$a[1]</li>!);
-ok ($html =~ m!<li>$a[2]</li>!);
+# h3cat
+$text = <<END;
+*hobby*[hobby]my hobby
+I like this.
+END
 
-$text = &ultext2(@a);
 $p->parse($text);
 $html = $p->html;
-ok ($html =~ m!<ul>.+<ul>.+<ul>!s);
-ok ($html =~ m!<li>$a[0]</li>!);
-ok ($html =~ m!<li>$a[1]</li>!);
-ok ($html =~ m!<li>$a[2]</li>!);
 
-$text = &oltext(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ m!<ol>!);
-ok ($html =~ m!<li>$a[0]</li>!);
-ok ($html =~ m!<li>$a[1]</li>!);
-ok ($html =~ m!<li>$a[2]</li>!);
+$html2 = <<END;
+<div class="section">
+	<h3><a href="http://d.hatena.ne.jp/jkondo/20050906#hobby" name="hobby"><span class="sanchor">sa</span></a> [<a href="http://d.hatena.ne.jp/jkondo/?word=hobby" class="sectioncategory">hobby</a>]my hobby</h3>
+	<p>I like this.</p>
+</div>
+END
+chomp $html2;
 
-@a = ('#!/usr/bin/perl');
-$text = &pretext(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ m!<pre>!);
-ok ($html =~ m!\Q$a[0]\E!);
+ok ($html eq $html2);
 
-$text = &superpretext(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ m!<pre>!);
-ok ($html =~ m!\Q$a[0]\E!);
+# h4
+$text = <<END;
+**h4title
 
-@a = ('Lang', 'Module', 'Perl', 'Text::Hatena');
-$text = &tabletext(@a);
-$p->parse($text);
-$html = $p->html;
-ok ($html =~ m!<table>.+</table>!s);
-ok ($html =~ m!<tr>.+</tr>.+<tr>.+</tr>!s);
-ok ($html =~ m!<th>$a[0]</th>!);
-ok ($html =~ m!<th>$a[1]</th>!);
-ok ($html =~ m!<td>$a[2]</td>!);
-ok ($html =~ m!<td>$a[3]</td>!);
+h4body
+END
 
-@a = ('GNU', 'GNU Is Not Unix', 'is not unix');
-$text = &footnotetext(@a);
 $p->parse($text);
 $html = $p->html;
-ok ($html =~ m!$a[0]<span class="footnote"><a.+?>\*1</a></span>$a[2]!);
-ok ($html =~ m!<p class="footnote"><a.+?>\*1</a>.+$a[1]</p>!s);
+$html2 = <<END;
+<div class="section">
+	<h4>h4title</h4>
+	
+	<p>h4body</p>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
+
+#h5
+$text = <<END;
+***h5title
+
+h5body
+END
+
+$p->parse($text);
+$html = $p->html;
+
+$html2 = <<END;
+<div class="section">
+	<h5>h5title</h5>
+	
+	<p>h5body</p>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
+
+# blockquote
+$text = <<END;
+>>
+quoted
+<<
+END
+
+$p->parse($text);
+$html = $p->html;
+$html2 = <<END;
+<div class="section">
+	<blockquote>
+		<p>quoted</p>
+	</blockquote>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
+
+# dl
+$text = <<END;
+:cinnamon:dog
+END
+
+$p->parse($text);
+$html = $p->html;
+$html2 = <<END;
+<div class="section">
+	<dl>
+		<dt>cinnamon</dt>
+		<dd>dog</dd>
+	</dl>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
+
+# ul
+$text = <<END;
+-komono
+-kyoto
+-shibuya
+END
+
+$p->parse($text);
+$html = $p->html;
+
+$html2 = <<END;
+<div class="section">
+	<ul>
+		<li>komono</li>
+		<li>kyoto</li>
+		<li>shibuya</li>
+	</ul>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
+
+# ul2
+$text = <<END;
+-komono
+--kyoto
+---shibuya
+END
+
+$p->parse($text);
+$html = $p->html;
+
+$html2 = <<END;
+<div class="section">
+	<ul>
+		<li>komono</li>
+		<li>
+		<ul>
+			<li>kyoto</li>
+			<li>
+			<ul>
+				<li>shibuya</li>
+			</ul>
+			</li>
+		</ul>
+		</li>
+	</ul>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
+
+# ol
+$text = <<END;
++komono
++kyoto
++shibuya
+END
+$p->parse($text);
+$html = $p->html;
+$html2 = <<END;
+<div class="section">
+	<ol>
+		<li>komono</li>
+		<li>kyoto</li>
+		<li>shibuya</li>
+	</ol>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
+
+# pre
+$text = <<END;
+>|
+#!/usr/bin/perl
+|<
+END
+
+$p->parse($text);
+$html = $p->html;
+
+$html2 = <<END;
+<div class="section">
+	<pre>
+#!/usr/bin/perl
+</pre>
+</div>
+END
+chomp $html2;
+ok ($html eq $html2);
+
+# superpre
+$text = <<END;
+>||
+html starts with <html>.
+||<
+END
+
+$p->parse($text);
+$html = $p->html;
+$html2 = <<END;
+<div class="section">
+	<pre>
+html starts with &lt;html&gt;.
+</pre>
+</div>
+END
+chomp $html2;
+
+ok ($html eq $html2);
+
+# table
+$text = <<END;
+|*Lang|*Module|
+|Perl|Text::Hatena|
+END
+
+$p->parse($text);
+$html = $p->html;
+$html2 = <<END;
+<div class="section">
+	<table>
+		<tr>
+			<th>Lang</th>
+			<th>Module</th>
+		</tr>
+		<tr>
+			<td>Perl</td>
+			<td>Text::Hatena</td>
+		</tr>
+	</table>
+</div>
+END
+chomp $html2;
+
+ok ($html eq $html2);
+
 
 # tagline
 
@@ -146,7 +307,7 @@ chomp $html2;
 ok ($html eq $html2);
 
 # tag
-my $text = <<END;
+$text = <<END;
 ><blockquote>
 no paragraph
 lines
@@ -171,108 +332,23 @@ $html = $p->html;
 chomp $html2;
 ok ($html eq $html2);
 
-sub h3text {
-	return <<END;
-*$_[0]
-$_[1]
+# footnote
+$text = <<END;
+GNU((GNU Is Not Unix)) is not unix.
 END
-}
 
-sub h3timetext {
-	return <<END;
-*$_[0]*record time
-remember time.
+$p->parse($text);
+$html = $p->html;
+
+$html2 = <<END;
+<div class="section">
+	<p>GNU<span class="footnote"><a href="http://d.hatena.ne.jp/jkondo/20050906#f1" title="GNU Is Not Unix" name="fn1">*1</a></span> is not unix.</p>
+</div>
+<div class="footnote">
+	<p class="footnote"><a href="http://d.hatena.ne.jp/jkondo/20050906#fn1" name="f1">*1</a>: GNU Is Not Unix</p>
+</div>
 END
-}
 
-sub h3cattext {
-	return <<END;
-*$_[0]*[$_[0]]my hobby
-I like this.
-END
-}
-
-sub h4text {
-	return <<END;
-**$_[0]
-
-h4body
-END
-}
-
-sub h5text {
-	return <<END;
-***$_[0]
-
-h5body
-END
-}
-
-sub blockquotetext {
-	return <<END;
->>
-$_[0]
-<<
-END
-}
-
-sub dltext {
-    return <<END;
-:$_[0]:$_[1]
-END
-}
-
-sub ultext {
-    return <<END;
--$_[0]
--$_[1]
--$_[2]
-END
-}
-
-sub ultext2 {
-    return <<END;
--$_[0]
---$_[1]
----$_[2]
-END
-}
-
-sub oltext {
-    return <<END;
-+$_[0]
-+$_[1]
-+$_[2]
-END
-}
-
-sub pretext {
-    return <<END;
->|
-$_[0]
-|<
-END
-}
-
-sub superpretext {
-    return <<END;
->||
-$_[0]
-||<
-END
-}
-
-sub tabletext {
-    return <<END;
-|*$_[0]|*$_[1]|
-|$_[2]|$_[3]|
-END
-}
-
-sub footnotetext {
-    return <<END;
-$_[0](($_[1]))$_[2] 
-END
-}
+ok ($html eq $html2);
 
 __END__
