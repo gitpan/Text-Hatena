@@ -175,6 +175,7 @@ $text = <<END;
 -komono
 --kyoto
 ---shibuya
+--hachiyama
 END
 
 $p->parse($text);
@@ -183,15 +184,14 @@ $html = $p->html;
 $html2 = <<END;
 <div class="section">
 	<ul>
-		<li>komono</li>
-		<li>
+		<li>komono
 		<ul>
-			<li>kyoto</li>
-			<li>
+			<li>kyoto
 			<ul>
 				<li>shibuya</li>
 			</ul>
 			</li>
+			<li>hachiyama</li>
 		</ul>
 		</li>
 	</ul>

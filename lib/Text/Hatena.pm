@@ -5,7 +5,7 @@ use Text::Hatena::BodyNode;
 use Text::Hatena::FootnoteNode;
 use Text::Hatena::HTMLFilter;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub new {
     my $class = shift;
@@ -244,7 +244,7 @@ http://d.hatena.ne.jp/ (Japanese)
 =head1 AUTHOR
 
 Junya Kondo, E<lt>jkondo@hatena.ne.jpE<gt>
-id:ticiyuki, E<lt>http://d.hatena.ne.jp/tociyuki/E<gt>
+id:tociyuki, E<lt>http://d.hatena.ne.jp/tociyuki/E<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

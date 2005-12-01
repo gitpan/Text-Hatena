@@ -1,6 +1,10 @@
 Revision history for Perl extension Text::Hatena.
 
-0.05  Tue Dec 29
+0.06  Tue Dec 2
+	- fixed nested list problem.
+	- fixed typo.
+
+0.05  Tue Nov 29
 	- added HTMLFilter and sanitizing HTML process.
 	- added texthandler callback.
 	- removed "use 5.00.." in Makefile.PL
