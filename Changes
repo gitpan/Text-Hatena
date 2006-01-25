@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Hatena.
 
+0.07  Sat Jan 21
+	- added Text::Hatena::AutoLink. It makes many hyperlinks automatically.
+	- changed required version of HTML::Parser to 3.26.
+	- removed footnote syntax. Please treat '((...))' from your program.
+
 0.06  Tue Dec 2
 	- fixed nested list problem.
 	- fixed typo.

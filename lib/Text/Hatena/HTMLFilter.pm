@@ -8,6 +8,8 @@ sub new {
     my $self = {
 	context => $args{context},
 	html => '',
+        in_paragraph => 0,
+        in_anchor => 0,
     };
     bless $self,$class;
     $self->init;
@@ -63,7 +65,7 @@ sub texthandler {
     my $self = shift;
     return sub {
 	my $text = shift;
-	$text = &{$self->{context}->texthandler}($text, $self->{context});
+	$text = &{$self->{context}->texthandler}($text, $self->{context}, $self);
 	$self->{html} .= $text;
     }
 }
@@ -73,6 +75,11 @@ sub starthandler {
     return sub {
 	my ($tagname, $attr, $attrseq, $text) = @_;
 	if ($tagname =~ /$self->{allowtag}/) {
+            if ($tagname eq 'p') {
+                $self->{in_paragraph} = 1;
+            } elsif ($tagname eq 'a') {
+                $self->{in_anchor} = 1;
+            }
 	    my $ret = "<$tagname";
 	    for my $p (keys %{$attr}) {
 		my $v = $attr->{$p};
@@ -102,6 +109,11 @@ sub endhandler {
     return sub {
 	my ($tagname, $text) = @_;
 	if ($tagname =~ /$self->{allowtag}/) {
+            if ($tagname eq 'p') {
+                $self->{in_paragraph} = 0;
+            } elsif ($tagname eq 'a') {
+                $self->{in_anchor} = 0;
+            }
 	    $self->{html} .= "</$tagname>";
 	} else {
 	    $self->{html} .= $self->sanitize($text);
@@ -146,5 +158,7 @@ sub sanitize_url {
 }
 
 sub html { $_[0]->{html}; }
+sub in_paragraph { $_[0]->{in_paragraph}; }
+sub in_anchor { $_[0]->{in_anchor}; }
 
 1;

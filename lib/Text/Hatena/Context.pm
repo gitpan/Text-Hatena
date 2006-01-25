@@ -87,6 +87,12 @@ sub noparagraph {
     $self->{noparagraph};
 }
 
+sub autolink {
+    my $self = shift;
+    $self->{autolink} = $_[0] if defined $_[0];
+    $self->{autolink};
+}
+
 sub sectioncount { $_[0]->{sectioncount}; }
 sub incrementsection { $_[0]->{sectioncount}++; }
 

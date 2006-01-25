@@ -2,38 +2,50 @@ package Text::Hatena;
 use strict;
 use Text::Hatena::Context;
 use Text::Hatena::BodyNode;
-use Text::Hatena::FootnoteNode;
+#use Text::Hatena::FootnoteNode;
 use Text::Hatena::HTMLFilter;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my $class = shift;
     my %args = @_;
     my $self = {
-	html => '',
+        html => '',
         baseuri => $args{baseuri} || '',
         permalink => $args{permalink} || '',
         ilevel => $args{ilevel} || 0, # level of default indent
         invalidnode => $args{invalidnode} || [],
         sectionanchor => $args{sectionanchor} || 'o-',
 	texthandler => $args{texthandler} || sub {
-	    my ($text, $c) = @_;
+	    my ($text, $c, $hp) = @_;
+            return $text if $hp->in_anchor;
 	    my $p = $c->permalink;
-	    $text =~ s!
-		\(\((.+?)\)\)
-	    !
-                my ($note,$pre,$post) = ($1,$`,$');
-                if ($pre =~ /\)$/ && $post =~ /^\(/) {
-                    "(($note))";
-                } else {
-                    my $notes = $c->footnotes($note);
-                    my $num = $#$notes + 1;
-                    $note =~ s/<.*?>//g;
-                    $note =~ s/\&/\&amp\;/g;
-                    qq|<span class="footnote"><a href="$p#f$num" title="$note" name="fn$num">*$num</a></span>|;
-                }
-	    !egox;
+            my $al;
+            unless ($al = $c->autolink) {
+                # cache instance
+                use Text::Hatena::AutoLink;
+                my $a = Text::Hatena::AutoLink->new(%{$args{autolink_option}});
+                $c->autolink($a);
+                $al = $a;
+            }
+            $text = $al->parse($text, {
+                in_paragraph => $hp->in_paragraph,
+            });
+# 	    $text =~ s!
+# 		\(\((.+?)\)\)
+# 	    !
+#                 my ($note,$pre,$post) = ($1,$`,$');
+#                 if ($pre =~ /\)$/ && $post =~ /^\(/) {
+#                     "(($note))";
+#                 } else {
+#                     my $notes = $c->footnotes($note);
+#                     my $num = $#$notes + 1;
+#                     $note =~ s/<.*?>//g;
+#                     $note =~ s/\&/\&amp\;/g;
+#                     qq|<span class="footnote"><a href="$p#f$num" title="$note" name="fn$num">*$num</a></span>|;
+#                 }
+# 	    !egox;
 	    return $text;
 	},
     };
@@ -116,6 +128,14 @@ Here are common methods of Text::Hatena.
     ilevel => 1,
     invalidnode => [qw(h4 h5)],
     sectionanchor => '@',
+    autolink_option => {
+      a_target => '_blank',
+      scheme_option => {
+        id => {
+          a_target => '',
+        },
+      ),
+    },
   );
 
 creates an instance of Text::Hatena.
@@ -127,6 +147,8 @@ C<ilevel> is the base indent level.
 C<invalidnode> is an array reference of invalid nodes. The node in the array will be skipped.
 
 C<sectionanchor> is the string of H3 section anchor.
+
+C<autolink_option> are the options for L<Text::Hatena::AutoLink>.
 
 =item parse
 
@@ -239,6 +261,7 @@ To encode special characters into HTML entities, use >|| and ||< for >| and |<. 
 
 =head1 SEE ALSO
 
+L<Text::Hatena::AutoLink>
 http://d.hatena.ne.jp/ (Japanese)
 
 =head1 AUTHOR

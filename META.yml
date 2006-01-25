@@ -1,11 +1,14 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Text-Hatena
-version:      0.06
+version:      0.07
 version_from: lib/Text/Hatena.pm
 installdirs:  site
 requires:
-    HTML::Parser:                  3.45
+    Class::Data::Inheritable:      0.04
+    HTML::Parser:                  3.26
+    Net::Amazon:                   0.34
+    URI::Title:                    1.61
 
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.17
