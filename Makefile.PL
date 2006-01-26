@@ -7,6 +7,7 @@ WriteMakefile(
         Class::Data::Inheritable => 0.04,
         Net::Amazon => 0.34,
         URI::Title => 1.61,
+        Template => 2.14,
     },
     ($] >= 5.005 ?
       (ABSTRACT_FROM  => 'lib/Text/Hatena.pm',

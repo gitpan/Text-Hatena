@@ -30,15 +30,16 @@ sub _parse_diary {
     my $self = shift;
     my $text = shift or return;
     $text =~ /$pattern_diary/ or return;
-    if ($5) {
-        my $delim = $5 eq ':' ? '/' : '#';
+    my ($m1,$m2,$m3,$m4,$m5,$m6) = ($1,$2,$3 || '',$4 || '',$5 || '',$6 || '');
+    if ($m5) {
+        my $delim = $m5 eq ':' ? '/' : '#';
         return sprintf('<a href="http://%s/%s/%s%s%s"%s>%s%s%s%s</a>',
-                       $self->{domain}, $2, $4,
-                       $delim, $6, $self->{a_target_string}, $1, $3, $5, $6,);
+                       $self->{domain}, $m2, $m4, $delim,
+                       $m6, $self->{a_target_string}, $m1, $m3, $m5, $m6,);
     } else {
         return sprintf('<a href="http://%s/%s/%s"%s>%s%s</a>',
-                       $self->{domain}, $2, $4, $self->{a_target_string},
-                       $1, $3,);
+                       $self->{domain}, $m2, $m4, $self->{a_target_string},
+                       $m1, $m3,);
     }
 }
 
@@ -46,7 +47,7 @@ sub _parse_about {
     my $self = shift;
     my $text = shift or return;
     $text =~ /$pattern_about/ or return;
-    my ($content,$username,$page) = ($1,$2,$3);
+    my ($content,$username,$page) = ($1,$2,$3 || '');
     return sprintf('<a href="http://%s/%s/%s"%s>%s</a>',
                    $self->{domain}, $username, $page, $self->{a_target_string},
                    $content);
@@ -56,7 +57,7 @@ sub _parse_archive {
     my $self = shift;
     my $text = shift or return;
     $text =~ /$pattern_archive/ or return;
-    my ($content,$username,$page,$month) = ($1,$2,$3,$4);
+    my ($content,$username,$page,$month) = ($1,$2,$3 || '',$4 || '');
     $month = "/$month" if $month;
     return sprintf('<a href="%s/%s/%s%s"%s>%s</a>',
                    $self->{domain}, $username, $page, $month,

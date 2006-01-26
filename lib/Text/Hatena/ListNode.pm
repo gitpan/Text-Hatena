@@ -32,7 +32,7 @@ sub parse {
         } else {
 	    $self->_closeitem if $self->{open};
             $c->shiftline;
-	    my $nl = $c->nextline;
+	    my $nl = $c->nextline || '';
 	    my $content = $2;
 	    if ($nl =~ /$self->{pattern}/ && length($1) > $self->{llevel}) {
 		$c->htmllines("$t\t<li>$content");

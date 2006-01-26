@@ -1,8 +1,13 @@
 Revision history for Perl extension Text::Hatena.
 
+0.08  Thu Jan 26
+	- Fixed HatenaID syntax bug. (wrong image url)
+	- removed warnings. (thanks hkrn)
+	- Amazon affiliate ID can be changed.
+
 0.07  Sat Jan 21
 	- added Text::Hatena::AutoLink. It makes many hyperlinks automatically.
-	- changed required version of HTML::Parser to 3.26.
+	- changed required version of HTML::Parser to 3.26. (thanks kazeburo)
 	- removed footnote syntax. Please treat '((...))' from your program.
 
 0.06  Tue Dec 2

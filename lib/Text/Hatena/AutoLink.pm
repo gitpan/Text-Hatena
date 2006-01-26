@@ -1,7 +1,7 @@
 package Text::Hatena::AutoLink;
 use strict;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $SCHEMES = {
     mailto => 'Text::Hatena::AutoLink::Mailto',
     asin => 'Text::Hatena::AutoLink::ASIN',
@@ -52,7 +52,9 @@ sub init {
 sub add_scheme {
     my $self = shift;
     my %args = @_;
-    $SCHEMES->{%args};
+    for (keys %args) {
+        $SCHEMES->{$_} = $args{$_};
+    }
     $self->init;
 }
 
@@ -120,7 +122,7 @@ It will work without any options.
 
 C<a_target> is the target name used in anchors. It can be overwritten by scheme options.
 
-C<invalidnode> is an array reference of invalid schemes. The scheme in the array will be skipped.
+C<invalid_scheme> is an array reference of invalid schemes. The scheme in the array will be skipped.
 
 C<scheme_option> are options for many schemes. You can use some common options and scheme characteristic options.
 
@@ -134,7 +136,7 @@ parses text and make links. It returns parsed html.
 
 =head1 Text::Hatena::AutoLink Syntax
 
-Text::Hatena::AutoLink supports some simple markup language.
+Text::Hatena::AutoLink supports some simple syntaxes.
 
   http://www.hatena.ne.jp/
   mailto:someone@example.com
@@ -142,7 +144,7 @@ Text::Hatena::AutoLink supports some simple markup language.
   [tex:x^2+y^2=z^2]
   d:id:jkondo
 
-These lines all become hyperlinks.
+These lines all become into hyperlinks.
 
 =head1 SEE ALSO
 

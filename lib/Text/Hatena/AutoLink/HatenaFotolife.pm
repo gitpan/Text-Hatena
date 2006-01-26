@@ -16,7 +16,7 @@ sub parse {
     my $self = shift;
     my $text = shift or return;
     $text =~ /$pattern/ or return;
-    my ($name,$fid,$ext,$type,$size) = ($1,$2,$3,$4,$5);
+    my ($name,$fid,$ext,$type,$size) = ($1,$2 || '',$3 || '',$4 || '',$5 || '');
     if ($ext =~ /^g$/i) {
         $ext = 'gif';
     } elsif ($ext =~ /^p$/i) {
@@ -35,7 +35,7 @@ sub parse {
     } elsif ($type =~ /image/i) {
         my $firstchar = substr($name,0,1);
         my $date = substr($fid,0,8);
-        my ($size_str, $file_name);
+        my ($size_str, $file_name) = ('','');
         if ($size =~ /small/i) {
             $file_name = sprintf('%s_m.gif', $fid);
         } else {
@@ -46,7 +46,7 @@ sub parse {
                 $size_str = sprintf(' width="%d"', $1);
             }
         }
-        return sprintf('<a href="http://%s/%s/%s"%s><img src="http://%s/images/fotolife/%s/%s/%d/%s" alt="%s" title="%s"%s%s></a>',
+        return sprintf('<a href="http://%s/%s/%s"%s><img src="http://%s/images/fotolife/%s/%s/%d/%s" alt="%s" title="%s"%s></a>',
                        $self->{domain},
                        $name,
                        $fid,
@@ -59,7 +59,6 @@ sub parse {
                        $text,
                        $text,
                        $size_str,
-                       $self->{img_class_string},
                    );
     } else {
         return sprintf('<a href="http://%s/%s/%s%s>%s</a>',

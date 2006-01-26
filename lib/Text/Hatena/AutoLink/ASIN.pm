@@ -31,9 +31,11 @@ sub init {
     $self->SUPER::init;
     $self->{asin_url} = 'http://d.hatena.ne.jp/asin/';
     $self->{keyword_url} = 'http://d.hatena.ne.jp/keyword/';
-    $self->{amazon_token} = 'D3TT1SUCX72K1N';
-    $self->{amazon_locale} = 'jp';
-    $self->{amazon_affiliate_id} = 'hatena-22';
+    $self->{amazon_token} = $self->{option}->{amazon_token} || 'D3TT1SUCX72K1N';
+    $self->{amazon_locale} = $self->{option}->{amazon_locale} || 'jp';
+    $self->{amazon_affiliate_id} = $self->{option}->{amazon_affiliate_id} || 'hatena-22';
+    $self->{affiliate_path} = $self->{option}->{amazon_affiliate_id} ?
+        '/' . $self->{amazon_affiliate_id} : '';
 }
 
 sub parse {
@@ -55,9 +57,10 @@ sub _parse_asin_title {
     $asincode = uc($asincode);
     $asincode =~ s/\-//g;
     $title ||= $self->get_asin_title($asincode) || "$scheme:$asincode";
-    return sprintf('<a href="%s%s"%s>%s</a>',
+    return sprintf('<a href="%s%s%s"%s>%s</a>',
                    $self->{asin_url},
                    $asincode,
+                   $self->{affiliate_path},
                    $self->{a_target_string},
                    $title,
                );
@@ -68,10 +71,10 @@ sub _parse_asin {
     my $text = shift;
     my $opt = shift;
     $text =~ /$pattern_asin/ or return;
-    my ($scheme,$asincode,$type,$size) = ($1,$2,$3,$4);
+    my ($scheme,$asincode,$type,$size) = ($1, $2, $3 || '', $4 || '');
     $asincode = uc($asincode);
     $asincode =~ s/\-//g;
-    my $asin_url = sprintf('%s%s', $self->{asin_url}, $asincode);
+    my $asin_url = sprintf('%s%s%s', $self->{asin_url}, $asincode, $self->{affiliate_path});
     if ($type =~ /^title/i) {
         my $title = $self->get_asin_title($asincode) || "$scheme:$asincode";
         return sprintf('<a href="%s"%s>%s</a>',

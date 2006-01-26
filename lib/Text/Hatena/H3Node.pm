@@ -27,8 +27,10 @@ sub parse {
             qq|[<a class="sectioncategory" href="$b?word=$ew">$w</a>]|;
         !gex;
     }
-    my $extra = '';
+    my $extra;
     ($name, $extra) = $self->_formatname($name);
+    $extra ||= '';
+    $cat ||= '';
     $c->htmllines(qq($t<h3><a href="$p#$name" name="$name"><span class="sanchor">$sa</span></a> $cat$title</h3>$extra));
 }
 

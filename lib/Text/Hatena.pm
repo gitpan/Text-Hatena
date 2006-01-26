@@ -5,7 +5,7 @@ use Text::Hatena::BodyNode;
 #use Text::Hatena::FootnoteNode;
 use Text::Hatena::HTMLFilter;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
     my $class = shift;
@@ -173,10 +173,6 @@ Text::Hatena supports some simple markup language, which is similar to the Wiki 
 =item Paragraphs
 
 Basically each line becomes a paragraph. If you want to force a newline in a paragraph, you can use a line break markup of HTML.
-
-You can add footnotes by using double parentheses.
-
-  Hatena is in Tokyo((The biggest city in Japan)).
 
 Text::Hatena treats a blank line as the end of a block. A blank line after a paragraph does not affect the output. Two blank lines are translated into a line break, three blank lines are translated into two line breaks and so on.
 

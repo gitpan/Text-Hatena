@@ -36,7 +36,7 @@ sub _parse_useful {
     my $text = shift or return;
     my $opt = shift;
     $text =~ /$pattern_useful/ or return;
-    my ($url,$type,$title,$size) = ($1,$2,$3,$4);
+    my ($url,$type,$title,$size) = ($1, $2, $3, $4 || '');
     if ($type =~ /^title/i) {
         $title ||= $self->_get_page_title($url);
         return sprintf('<a href="%s"%s>%s</a>',

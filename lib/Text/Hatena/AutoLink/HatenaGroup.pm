@@ -50,11 +50,15 @@ sub _parse_group_diary {
     my $self = shift;
     my $text = shift or return;
     $text =~ /$pattern_group_diary/ or return;
-    if ($7) {
-        my $delim = $7 eq ':' ? '/' : '#';
-        return qq|<a href="http://$2.|.$self->{domain}.qq|/$4/$6$delim$8">$1$3$5$7$8</a>|;
+    my ($m1,$m2,$m3,$m4,$m5,$m6,$m7,$m8) = ($1,$2,$3 || '',$4 || '',$5 || '',$6 || '',$7,$8);
+    if ($m7) {
+        my $delim = $m7 eq ':' ? '/' : '#';
+        return sprintf('<a href="http://%s.%s/%s/%s%s%s">%s%s%s%s%s</a>',
+                       $m2, $self->{domain}, $m4, $m6, $delim, $m8, $m1, $m3,
+                       $m5, $m7, $m8);
     } else {
-        return qq|<a href="http://$2.|.$self->{domain}.qq|/$4/$6">$1$3$5</a>|;
+        return sprintf('<a href="http://%s.%s/%s/%s">%s%s%s</a>',
+                       $m2, $self->{domain}, $m4, $m6, $m1, $m3, $m5);
     }
 }
 
