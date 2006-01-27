@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::Hatena.
 
+0.09  Fri Jan 27
+	- added f:t:... / f:keyword:... syntax.
+	- added antenna, rss, idea, question scheme.
+
 0.08  Thu Jan 26
 	- Fixed HatenaID syntax bug. (wrong image url)
 	- removed warnings. (thanks hkrn)

@@ -15,6 +15,11 @@ t/09_autolink_hatenadiary.t
 t/10_autolink_hatenaid.t
 t/11_autolink_tex.t
 t/12_autolink_unbracket.t
+t/13_autolink_hatenaantenna.t
+t/14_autolink_hatenabookmark.t
+t/15_autolink_hatenarss.t
+t/16_autolink_hatenaidea.t
+t/17_autolink_hatenaquestion.t
 t/99_autolink_unit.t
 lib/Text/Hatena.pm
 lib/Text/Hatena/BodyNode.pm
@@ -41,10 +46,15 @@ lib/Text/Hatena/HTMLFilter.pm
 lib/Text/Hatena/AutoLink.pm
 lib/Text/Hatena/AutoLink/ASIN.pm
 lib/Text/Hatena/AutoLink/FTP.pm
+lib/Text/Hatena/AutoLink/HatenaAntenna.pm
+lib/Text/Hatena/AutoLink/HatenaBookmark.pm
 lib/Text/Hatena/AutoLink/HatenaDiary.pm
 lib/Text/Hatena/AutoLink/HatenaFotolife.pm
 lib/Text/Hatena/AutoLink/HatenaGroup.pm
 lib/Text/Hatena/AutoLink/HatenaID.pm
+lib/Text/Hatena/AutoLink/HatenaIdea.pm
+lib/Text/Hatena/AutoLink/HatenaQuestion.pm
+lib/Text/Hatena/AutoLink/HatenaRSS.pm
 lib/Text/Hatena/AutoLink/HTTP.pm
 lib/Text/Hatena/AutoLink/Mailto.pm
 lib/Text/Hatena/AutoLink/Scheme.pm

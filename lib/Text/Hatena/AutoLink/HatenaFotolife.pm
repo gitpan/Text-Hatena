@@ -2,9 +2,10 @@ package Text::Hatena::AutoLink::HatenaFotolife;
 use strict;
 use base qw(Text::Hatena::AutoLink::Scheme);
 
-my $pattern = qr/\[?f:id:([A-Za-z][a-zA-Z0-9_\-]{2,14})(?::(\d{14}|favorite)([jpg])?)?(?::(image)(?::?(small|h\d+|w\d+))?)?\]?/i;
+my $pattern_foto = qr/\[?f:id:([A-Za-z][a-zA-Z0-9_\-]{2,14})(?::(\d{14}|favorite)([jpg])?)?(?::(image)(?::?(small|h\d+|w\d+))?)?\]?/i;
+my $pattern_keyword = qr/\[(f:(keyword|t):([^\]]+))\]/i;
 
-__PACKAGE__->patterns([$pattern]);
+__PACKAGE__->patterns([$pattern_foto, $pattern_keyword]);
 
 sub init {
     my $self = shift;
@@ -15,7 +16,17 @@ sub init {
 sub parse {
     my $self = shift;
     my $text = shift or return;
-    $text =~ /$pattern/ or return;
+    if ($text =~ /$pattern_foto/) {
+        $self->_parse_foto($text);
+    } elsif ($text =~ /$pattern_keyword/) {
+        $self->_parse_keyword($text);
+    }
+}
+
+sub _parse_foto {
+    my $self = shift;
+    my $text = shift or return;
+    $text =~ /$pattern_foto/ or return;
     my ($name,$fid,$ext,$type,$size) = ($1,$2 || '',$3 || '',$4 || '',$5 || '');
     if ($ext =~ /^g$/i) {
         $ext = 'gif';
@@ -69,6 +80,16 @@ sub parse {
                        $text,
                    );
     }
+}
+
+sub _parse_keyword {
+    my $self = shift;
+    my $text = shift or return;
+    $text =~ /$pattern_keyword/ or return;
+    my ($title, $type, $word) = ($1, $2, $3 || '');
+    return sprintf('<a href="http://%s/%s/%s"%s>%s</a>',
+                   $self->{domain}, $type, $self->html_encode($word),
+                   $self->{a_target_string}, $title);
 }
 
 1;

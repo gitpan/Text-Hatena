@@ -1,18 +1,26 @@
 package Text::Hatena::AutoLink;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $SCHEMES = {
+    question => 'Text::Hatena::AutoLink::HatenaQuestion',
     mailto => 'Text::Hatena::AutoLink::Mailto',
+    https => 'Text::Hatena::AutoLink::HTTP',
     asin => 'Text::Hatena::AutoLink::ASIN',
     http => 'Text::Hatena::AutoLink::HTTP',
+    idea => 'Text::Hatena::AutoLink::HatenaIdea',
     isbn => 'Text::Hatena::AutoLink::ASIN',
     ftp => 'Text::Hatena::AutoLink::FTP',
     tex => 'Text::Hatena::AutoLink::Tex',
     id => 'Text::Hatena::AutoLink::HatenaID',
+    a => 'Text::Hatena::AutoLink::HatenaAntenna',
+    b => 'Text::Hatena::AutoLink::HatenaBookmark',
     d => 'Text::Hatena::AutoLink::HatenaDiary',
     f => 'Text::Hatena::AutoLink::HatenaFotolife',
     g => 'Text::Hatena::AutoLink::HatenaGroup',
+    i => 'Text::Hatena::AutoLink::HatenaIdea',
+    q => 'Text::Hatena::AutoLink::HatenaQuestion',
+    r => 'Text::Hatena::AutoLink::HatenaRSS',
     ']' => 'Text::Hatena::AutoLink::Unbracket',
 };
 
@@ -33,6 +41,7 @@ sub init {
     my %invalid;
     for (@{$self->{invalid_scheme}}) { $invalid{$_}++; }
     $self->{parser} = {};
+    my %known;
     for my $scheme (keys %$SCHEMES) {
         next if $invalid{$scheme};
         my $p = $SCHEMES->{$scheme};
@@ -43,6 +52,7 @@ sub init {
             $option->{a_target} = $self->{a_target};
         }
         $self->{parser}->{$scheme} = $p->new(%$option);
+        next if $known{$p}++;
         $self->{pattern} .= '|' if $self->{pattern};
         $self->{pattern} .= $self->{parser}->{$scheme}->pattern;
     }
@@ -69,10 +79,12 @@ sub parse {
                my $text = $1;
                my $parser;
                for my $sc (@schemes) {
-                    if ($text =~ /^\[?\Q$sc\E/i) {
+                   if ($sc =~ /^\w+$/ && $text =~ /^\[?$sc:/i) {
                        $parser = $self->{parser}->{$sc};
-                       last;
+                   } elsif ($text =~ /^\[?\Q$sc\E/i) {
+                       $parser = $self->{parser}->{$sc};
                    }
+                   last if $parser;
                }
                $parser->parse($text, $opt);
         !gex;
@@ -139,12 +151,18 @@ parses text and make links. It returns parsed html.
 Text::Hatena::AutoLink supports some simple syntaxes.
 
   http://www.hatena.ne.jp/
+  [http://www.hatena.ne.jp/:title=Hatena]
+  [http://www.hatena.ne.jp/images/top/h1.gif:image]
   mailto:someone@example.com
   asin:4798110523
   [tex:x^2+y^2=z^2]
   d:id:jkondo
 
 These lines all become into hyperlinks.
+
+  []id:jkondo[]
+
+You can avoid being hyperlinked with 2 pair brackets like the above line.
 
 =head1 SEE ALSO
 
