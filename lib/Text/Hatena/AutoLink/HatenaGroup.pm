@@ -73,7 +73,7 @@ sub _parse_group_keyword {
                    $self->{domain},
                    $enword,
                    $gname,
-                   $self->sanitize($word),
+                   $word,
                );
 }
 

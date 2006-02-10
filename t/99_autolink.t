@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 BEGIN { use_ok('Text::Hatena') };
 BEGIN { use_ok('Text::Hatena::AutoLink') };
@@ -11,7 +11,12 @@ my $t = Text::Hatena::AutoLink->new;
 $text = 'Here is my album. f:id:sample';
 $html = $t->parse($text);
 $html2 = 'Here is my album. <a href="http://f.hatena.ne.jp/sample/">f:id:sample</a>';
-ok ($html eq $html2);
+is ($html, $html2);
+
+$text = 'Hatena news. [google:news:はてな]';
+$html = $t->parse($text);
+$html2 = 'Hatena news. <a href="http://news.google.com/news?q=%e3%81%af%e3%81%a6%e3%81%aa&ie=utf-8&oe=utf-8">google:news:はてな</a>';
+is ($html, $html2);
 
 my $base = 'http://d.hatena.ne.jp/jkondo/';
 my $perma = 'http://d.hatena.ne.jp/jkondo/20050906';
@@ -43,7 +48,7 @@ $p->parse($text);
 $html = $p->html;
 chomp $html2;
 
-ok ($html eq $html2);
+is ($html, $html2);
 
 $text = <<END;
 *Hi
@@ -67,7 +72,7 @@ $p->parse($text);
 $html = $p->html;
 chomp $html2;
 
-ok ($html eq $html2);
+is ($html, $html2);
 
 
 $text = <<END;
@@ -86,7 +91,7 @@ END
 $p->parse($text);
 $html = $p->html;
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 $text = <<END;
 Hello, []id:jkondo[].
@@ -101,7 +106,7 @@ END
 $p->parse($text);
 $html = $p->html;
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 
 $t = Text::Hatena::AutoLink->new(
@@ -116,7 +121,7 @@ $t = Text::Hatena::AutoLink->new(
 $text = 'http://www.hatena.ne.jp/ &gt; id:jkondo';
 $html = $t->parse($text);
 $html2 = '<a href="http://www.hatena.ne.jp/" target="_blank">http://www.hatena.ne.jp/</a> &gt; <a href="/jkondo/">id:jkondo</a>';
-ok ($html eq $html2);
+is ($html, $html2);
 
 
 $p = Text::Hatena->new(
@@ -144,4 +149,4 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);

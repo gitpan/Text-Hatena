@@ -24,7 +24,7 @@ sub parse {
         !
             my $w = $1;
             my $ew = $self->_encode($1);
-            qq|[<a class="sectioncategory" href="$b?word=$ew">$w</a>]|;
+            qq|[<a href="$b?word=$ew" class="sectioncategory">$w</a>]|;
         !gex;
     }
     my $extra;

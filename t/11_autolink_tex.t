@@ -12,4 +12,4 @@ $text = 'formula [tex:x^2+y^2=z^2]';
 $html = $text;
 $html =~ s/($pat)/$t->parse($1);/ge;
 $html2 = 'formula <img src="http://d.hatena.ne.jp/cgi-bin/mimetex.cgi?x^2+y^2=z^2" class="tex" alt="x^2+y^2=z^2">';
-ok ($html eq $html2);
+is ($html, $html2);

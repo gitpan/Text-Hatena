@@ -42,7 +42,7 @@ sub _parse_useful {
         return sprintf('<a href="%s"%s>%s</a>',
                        $url,
                        $self->{a_target_string},
-                       $self->sanitize($title),
+                       $title,
                    );
 
     } elsif ($type =~ /^detail/i) {
@@ -51,7 +51,7 @@ sub _parse_useful {
                        $url,
                        $self->{a_target_string},
                        $url,
-                       $self->sanitize($title),
+                       $title,
                    );
         $html = "</p>$html<p>" if $opt->{in_paragraph};
         return $html;

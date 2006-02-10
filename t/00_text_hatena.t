@@ -13,7 +13,7 @@ my $p = Text::Hatena->new(
 	invalidnode => [],
 	sectionanchor => $sa,
 );
-ok (ref($p) eq 'Text::Hatena');
+isa_ok ($p, 'Text::Hatena');
 my ($text,$html,$html2,@a);
 
 # h3
@@ -33,7 +33,7 @@ $p->parse($text);
 $html = $p->html;
 chomp $html2;
 
-ok ($html eq $html2);
+is ($html, $html2);
 
 # h3time
 $text = <<END;
@@ -51,7 +51,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # h3cat
 $text = <<END;
@@ -70,7 +70,7 @@ $html2 = <<END;
 END
 chomp $html2;
 
-ok ($html eq $html2);
+is ($html, $html2);
 
 # h4
 $text = <<END;
@@ -89,7 +89,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 #h5
 $text = <<END;
@@ -109,7 +109,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # blockquote
 $text = <<END;
@@ -128,7 +128,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # dl
 $text = <<END;
@@ -146,7 +146,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # ul
 $text = <<END;
@@ -168,7 +168,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # ul2
 $text = <<END;
@@ -198,7 +198,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # ol
 $text = <<END;
@@ -218,7 +218,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # pre
 $text = <<END;
@@ -238,7 +238,7 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # superpre
 $text = <<END;
@@ -258,7 +258,7 @@ html starts with &lt;html&gt;.
 END
 chomp $html2;
 
-ok ($html eq $html2);
+is ($html, $html2);
 
 # table
 $text = <<END;
@@ -284,7 +284,7 @@ $html2 = <<END;
 END
 chomp $html2;
 
-ok ($html eq $html2);
+is ($html, $html2);
 
 
 # tagline
@@ -304,7 +304,7 @@ END
 $p->parse($text);
 $html = $p->html;
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # tag
 $text = <<END;
@@ -330,7 +330,7 @@ END
 $p->parse($text);
 $html = $p->html;
 chomp $html2;
-ok ($html eq $html2);
+is ($html, $html2);
 
 # footnote
 # $text = <<END;

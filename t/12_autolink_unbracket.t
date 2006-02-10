@@ -12,4 +12,4 @@ $text = 'I don\'t want to link []id:jkondo[].';
 $html = $text;
 $html =~ s/($pat)/$t->parse($1);/ge;
 $html2 = 'I don\'t want to link id:jkondo.';
-ok ($html eq $html2);
+is ($html, $html2);

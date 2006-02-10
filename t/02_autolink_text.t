@@ -8,4 +8,4 @@ my ($text, $html);
 
 $text = 'Hi, this is a simple text.';
 $html = $t->parse($text);
-ok ($text eq $html);
+is ($text, $html);

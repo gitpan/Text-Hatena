@@ -12,4 +12,4 @@ $text = 'send me a mail mailto:info@example.com';
 $html = $text;
 $html =~ s/($pat)/$t->parse($1);/ge;
 $html2 = 'send me a mail <a href="mailto:info@example.com">mailto:info@example.com</a>';
-ok ($html eq $html2);
+is ($html, $html2);

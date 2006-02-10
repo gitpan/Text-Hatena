@@ -13,4 +13,4 @@ $html = $text;
 $html =~ s/($pat)/$t->parse($1);/ge;
 
 $html2 = 'This is our files. <a href="ftp://www.hatena.ne.jp/">ftp://www.hatena.ne.jp/</a>';
-ok ($html eq $html2);
+is ($html, $html2);

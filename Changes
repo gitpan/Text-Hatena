@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::Hatena.
 
+0.10  Thu Feb 9
+	- removed sanitizing process from HTMLFilter and AutoLink::Schemes.
+	- added ean, graph, map, google, search, amazon, rakuten schemes.
+
 0.09  Fri Jan 27
 	- added f:t:... / f:keyword:... syntax.
 	- added antenna, rss, idea, question scheme.

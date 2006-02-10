@@ -12,4 +12,4 @@ $text = 'Here is my antenna. a:id:jkondo';
 $html = $text;
 $html =~ s/($pat)/$t->parse($1);/ge;
 $html2 = 'Here is my antenna. <a href="http://a.hatena.ne.jp/jkondo/">a:id:jkondo</a>';
-ok ($html eq $html2);
+is ($html, $html2);

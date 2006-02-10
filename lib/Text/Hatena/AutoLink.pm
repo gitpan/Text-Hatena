@@ -1,16 +1,23 @@
 package Text::Hatena::AutoLink;
 use strict;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $SCHEMES = {
     question => 'Text::Hatena::AutoLink::HatenaQuestion',
+    amazon => 'Text::Hatena::AutoLink::HatenaQuestion',
+    google => 'Text::Hatena::AutoLink::Google',
     mailto => 'Text::Hatena::AutoLink::Mailto',
+    search => 'Text::Hatena::AutoLink::HatenaSearch',
+    graph => 'Text::Hatena::AutoLink::HatenaGraph',
     https => 'Text::Hatena::AutoLink::HTTP',
     asin => 'Text::Hatena::AutoLink::ASIN',
     http => 'Text::Hatena::AutoLink::HTTP',
     idea => 'Text::Hatena::AutoLink::HatenaIdea',
     isbn => 'Text::Hatena::AutoLink::ASIN',
+    ean => 'Text::Hatena::AutoLink::EAN',
     ftp => 'Text::Hatena::AutoLink::FTP',
+    jan => 'Text::Hatena::AutoLink::EAN',
+    map => 'Text::Hatena::AutoLink::HatenaMap',
     tex => 'Text::Hatena::AutoLink::Tex',
     id => 'Text::Hatena::AutoLink::HatenaID',
     a => 'Text::Hatena::AutoLink::HatenaAntenna',

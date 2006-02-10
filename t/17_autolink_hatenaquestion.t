@@ -14,10 +14,10 @@ $text = 'My question history. q:id:jkondo';
 $html = $text;
 $html =~ s/($pat)/$t->parse($1);/ge;
 $html2 = 'My question history. <a href="http://q.hatena.ne.jp/jkondo/" target="_blank">q:id:jkondo</a>';
-ok ($html eq $html2);
+is ($html, $html2);
 
 $text = 'The first question. question:995116699';
 $html = $text;
 $html =~ s/($pat)/$t->parse($1);/ge;
 $html2 = 'The first question. <a href="http://q.hatena.ne.jp/995116699" target="_blank">question:995116699</a>';
-ok ($html eq $html2);
+is ($html, $html2);

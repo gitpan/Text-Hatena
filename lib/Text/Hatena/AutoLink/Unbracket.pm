@@ -10,7 +10,7 @@ sub parse {
     my $self = shift;
     my $text = shift;
     $text =~ /$pattern/ or return;
-    return $self->sanitize($1);
+    return $1;
 }
 
 1;
