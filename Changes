@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Hatena.
 
+0.11  Wed Apr 5
+	- escaped autolink in super pre.
+	- fixed bug in Hatenafotolife auto link.
+	- added converting process in URI::Title to utf-8.
+
 0.10  Thu Feb 9
 	- removed sanitizing process from HTMLFilter and AutoLink::Schemes.
 	- added ean, graph, map, google, search, amazon, rakuten schemes.

@@ -5,7 +5,7 @@ use Text::Hatena::BodyNode;
 #use Text::Hatena::FootnoteNode;
 use Text::Hatena::HTMLFilter;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub new {
     my $class = shift;
@@ -19,7 +19,7 @@ sub new {
         sectionanchor => $args{sectionanchor} || 'o-',
 	texthandler => $args{texthandler} || sub {
 	    my ($text, $c, $hp) = @_;
-            return $text if $hp->in_anchor;
+            return $text if ($hp->in_anchor || $hp->in_superpre);
 	    my $p = $c->permalink;
             my $al;
             unless ($al = $c->autolink) {

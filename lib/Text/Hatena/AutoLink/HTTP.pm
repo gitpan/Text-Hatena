@@ -2,6 +2,7 @@ package Text::Hatena::AutoLink::HTTP;
 use strict;
 use base qw(Text::Hatena::AutoLink::Scheme);
 use URI::Title qw(title);
+use Jcode;
 
 my $pattern_simple = qr/\[?(https?:\/\/[A-Za-z0-9~\/._\?\&=\-%#\+:\;,\@\']+)\]?/i;
 my $pattern_useful = qr/\[(https?:\/\/[A-Za-z0-9~\/._\?\&=\-%#\+:\;,\@\']+?):(title(?:=([^\]]*))?|barcode|detail|image(?::([hw]\d+))?)\]/i;
@@ -91,7 +92,7 @@ sub _parse_useful {
 sub _get_page_title {
     my $self = shift;
     my $url = shift or return;
-    return title($url) || 'no title';
+    return Jcode->new(title($url))->utf8 || 'no title';
 }
 
 1;

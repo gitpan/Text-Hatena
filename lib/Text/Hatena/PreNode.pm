@@ -2,7 +2,6 @@ package Text::Hatena::PreNode;
 use strict;
 use base qw(Text::Hatena::Node);
 
-
 sub init {
     my $self = shift;
     $self->{pattern} = qr/^>\|$/;

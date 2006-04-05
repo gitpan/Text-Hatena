@@ -6,7 +6,7 @@ sub init {
     my $self = shift;
     $self->{pattern} = qr/^>\|\|$/;
     $self->{endpattern} = qr/^\|\|<$/;
-    $self->{startstring} = qq|<pre>|;
+    $self->{startstring} = qq|<pre class="hatena-super-pre">|;
     $self->{endstring} = qq|</pre>|;
 }
 

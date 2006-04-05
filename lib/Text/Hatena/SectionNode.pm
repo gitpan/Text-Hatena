@@ -18,7 +18,7 @@ use Text::Hatena::CDataNode;
 
 sub init {
     my $self = shift;
-    $self->{childnode} = [qw(h5 h4 h3 blockquote dl list pre superpre table tagline tag)];
+    $self->{childnode} = [qw(h5 h4 h3 blockquote dl list superpre pre table tagline tag)];
     $self->{startstring} = qq|<div class="section">|;
     $self->{endstring} = qq|</div>|;
 }

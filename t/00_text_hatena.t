@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 17;
+use Test::More tests => 18;
 BEGIN { use_ok('Text::Hatena') };
 
 my $base = 'http://d.hatena.ne.jp/jkondo/';
@@ -221,19 +221,22 @@ chomp $html2;
 is ($html, $html2);
 
 # pre
-$text = <<END;
+$text = <<'END';
 >|
 #!/usr/bin/perl
+
+my $url = 'http://d.hatena.ne.jp/';
 |<
 END
 
 $p->parse($text);
 $html = $p->html;
 
-$html2 = <<END;
+$html2 = <<'END';
 <div class="section">
 	<pre>
 #!/usr/bin/perl
+my $url = '<a href="http://d.hatena.ne.jp/';">http://d.hatena.ne.jp/';</a>
 </pre>
 </div>
 END
@@ -251,7 +254,7 @@ $p->parse($text);
 $html = $p->html;
 $html2 = <<END;
 <div class="section">
-	<pre>
+	<pre class="hatena-super-pre">
 html starts with &lt;html&gt;.
 </pre>
 </div>
@@ -324,6 +327,31 @@ $html2 = <<END;
 	</blockquote>
 	<p>paragraph</p>
 	<p>lines</p>
+</div>
+END
+
+$p->parse($text);
+$html = $p->html;
+chomp $html2;
+is ($html, $html2);
+
+$text =<<END;
+Here is the way to make link.
+>||
+http://www.hatena.ne.jp/
+id:jkondo
+||<
+bye.
+END
+
+$html2 =<<END;
+<div class="section">
+	<p>Here is the way to make link.</p>
+	<pre class="hatena-super-pre">
+http://www.hatena.ne.jp/
+id:jkondo
+</pre>
+	<p>bye.</p>
 </div>
 END
 

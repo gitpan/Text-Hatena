@@ -72,7 +72,7 @@ sub _parse_foto {
                        $size_str,
                    );
     } else {
-        return sprintf('<a href="http://%s/%s/%s%s>%s</a>',
+        return sprintf('<a href="http://%s/%s/%s"%s>%s</a>',
                        $self->{domain},
                        $name,
                        $fid,

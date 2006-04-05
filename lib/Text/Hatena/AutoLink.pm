@@ -1,7 +1,7 @@
 package Text::Hatena::AutoLink;
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our $SCHEMES = {
     question => 'Text::Hatena::AutoLink::HatenaQuestion',
     amazon => 'Text::Hatena::AutoLink::HatenaQuestion',

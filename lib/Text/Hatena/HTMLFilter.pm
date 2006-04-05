@@ -10,6 +10,7 @@ sub new {
 	html => '',
         in_paragraph => 0,
         in_anchor => 0,
+        in_superpre => 0,
     };
     bless $self,$class;
     $self->init;
@@ -52,6 +53,8 @@ sub starthandler {
             $self->{in_paragraph} = 1;
         } elsif ($tagname eq 'a') {
             $self->{in_anchor} = 1;
+        } elsif ($tagname eq 'pre' && $attr->{class} eq 'hatena-super-pre') {
+            $self->{in_superpre} = 1;
         }
         $self->{html} .= $text;
 #         my $ret = "<$tagname";
@@ -75,6 +78,8 @@ sub endhandler {
             $self->{in_paragraph} = 0;
         } elsif ($tagname eq 'a') {
             $self->{in_anchor} = 0;
+        } elsif ($tagname eq 'pre' && $self->{in_superpre}) {
+            $self->{in_superpre} = 0;
         }
         $self->{html} .= $text;
     }
@@ -119,5 +124,6 @@ sub commenthandler {
 sub html { $_[0]->{html}; }
 sub in_paragraph { $_[0]->{in_paragraph}; }
 sub in_anchor { $_[0]->{in_anchor}; }
+sub in_superpre { $_[0]->{in_superpre}; }
 
 1;
