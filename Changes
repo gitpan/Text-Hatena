@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Hatena.
 
+0.12  Thu Apr 6
+        - changed process in Text::Hatena::AutoLink::HTTP's title process
+        - Now you don't need URI::Title and many modules.
+        - You can set the handler which treats the title (for encoding or doing something)
+
 0.11  Wed Apr 5
 	- escaped autolink in super pre.
 	- fixed bug in Hatenafotolife auto link.

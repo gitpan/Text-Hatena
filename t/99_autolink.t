@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 BEGIN { use_ok('Text::Hatena') };
 BEGIN { use_ok('Text::Hatena::AutoLink') };
@@ -149,4 +149,21 @@ $html2 = <<END;
 </div>
 END
 chomp $html2;
+is ($html, $html2);
+
+
+$t = Text::Hatena::AutoLink->new(
+    scheme_option => {
+        http => {
+            title_handler => sub {
+                my ($title, $charset) = @_;
+                return $title.$charset;
+            },
+        },
+    },
+);
+
+$text = '[http://www.yahoo.com/:title]';
+$html = $t->parse($text);
+$html2 = '<a href="http://www.yahoo.com/">Yahoo!utf-8</a>';
 is ($html, $html2);

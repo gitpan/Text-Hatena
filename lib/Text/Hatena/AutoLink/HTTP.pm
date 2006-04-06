@@ -1,8 +1,7 @@
 package Text::Hatena::AutoLink::HTTP;
 use strict;
 use base qw(Text::Hatena::AutoLink::Scheme);
-use URI::Title qw(title);
-use Jcode;
+use LWP::UserAgent;
 
 my $pattern_simple = qr/\[?(https?:\/\/[A-Za-z0-9~\/._\?\&=\-%#\+:\;,\@\']+)\]?/i;
 my $pattern_useful = qr/\[(https?:\/\/[A-Za-z0-9~\/._\?\&=\-%#\+:\;,\@\']+?):(title(?:=([^\]]*))?|barcode|detail|image(?::([hw]\d+))?)\]/i;
@@ -92,7 +91,25 @@ sub _parse_useful {
 sub _get_page_title {
     my $self = shift;
     my $url = shift or return;
-    return Jcode->new(title($url))->utf8 || 'no title';
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout(10);
+    $ua->max_size(131072); # 2^17
+    my $req = HTTP::Request->new(GET => $url);
+    my $res = $ua->request($req);
+    return unless $res->is_success;
+    my $content = $res->content or return;
+    $content =~ /<title.*?>(.*?)<\/title>/is or return;
+    my $title = $1;
+    if (my $h = $self->{option}->{title_handler}) {
+        my ($cset,$ct);
+        if ($ct = $res->header("Content-type") && $ct =~ /charset="?(.+?)"?$/i) {
+            $cset = lc $1;
+        } elsif ($content =~ /<meta[^>]+charset="?([\w\d\s\-]+)"?/i) {
+            $cset = lc $1;
+        }
+        $title = &{$h}($title, $cset);
+    }
+    return $title;
 }
 
 1;

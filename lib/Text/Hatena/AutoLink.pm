@@ -1,7 +1,7 @@
 package Text::Hatena::AutoLink;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $SCHEMES = {
     question => 'Text::Hatena::AutoLink::HatenaQuestion',
     amazon => 'Text::Hatena::AutoLink::HatenaQuestion',
@@ -132,6 +132,12 @@ Here are common methods of Text::Hatena::AutoLink.
     scheme_option => {
       id => {
         a_target => '',
+      },
+      http => {
+        title_handler => sub {
+          my ($title, $charset) = @_;
+          return Jcode->new($title, $charset)->utf8;
+        },
       },
     ),
   );
