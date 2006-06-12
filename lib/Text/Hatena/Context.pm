@@ -57,7 +57,7 @@ sub html {
 
 sub htmllines {
     my $self = shift;
-    push @{$self->{htmllines}}, $_[0] if $_[0];
+    push @{$self->{htmllines}}, $_[0] if defined $_[0];
     $self->{htmllines};
 }
 

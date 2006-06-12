@@ -236,6 +236,7 @@ $html2 = <<'END';
 <div class="section">
 	<pre>
 #!/usr/bin/perl
+
 my $url = '<a href="http://d.hatena.ne.jp/';">http://d.hatena.ne.jp/';</a>
 </pre>
 </div>

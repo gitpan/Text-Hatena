@@ -4,7 +4,33 @@ use base qw(Text::Hatena::AutoLink::Scheme);
 use LWP::UserAgent;
 
 my $pattern_simple = qr/\[?(https?:\/\/[A-Za-z0-9~\/._\?\&=\-%#\+:\;,\@\']+)\]?/i;
-my $pattern_useful = qr/\[(https?:\/\/[A-Za-z0-9~\/._\?\&=\-%#\+:\;,\@\']+?):(title(?:=([^\]]*))?|barcode|detail|image(?::([hw]\d+))?)\]/i;
+my $pattern_useful = qr/\[(https?:\/\/[A-Za-z0-9~\/._\?\&=\-%#\+:\;,\@\']+?):(title(?:=([^\]]*))?|barcode|detail|image|movie(?:=flv)?|sound(?:=mp3)?)(?::(small|large|[hw]\d+))?\]/i;
+
+my $tmpl_sound =<< 'EOD';
+<span style="vertical-align:middle;">
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="130" height="25" id="mp3_2" align="middle" style="vertical-align:bottom">
+<param name="flashVars" value="mp3Url=%s">
+<param name="allowScriptAccess" value="sameDomain">
+<param name="movie" value="http://g.hatena.ne.jp/tools/mp3_2.swf">
+<param name="quality" value="high">
+<param name="bgcolor" value="#ffffff">
+<param name="wmode" value="transparent">
+<embed src="http://g.hatena.ne.jp/tools/mp3_2.swf" flashvars="mp3Url=%s" quality="high" wmode="transparent" bgcolor="#ffffff" width="130" height="25" name="mp3_2" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" style="vertical-align:bottom">
+</object>
+<a href="%s"><img src="http://g.hatena.ne.jp/images/podcasting.gif" title="Download" alt="Download" border="0" style="border:0px;vertical-align:bottom;"></a>
+</span>
+EOD
+
+my $tmpl_movie =<< 'EOD';
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="320" height="205" id="flvplayer" align="middle">
+<param name="allowScriptAccess" value="sameDomain" />
+<param name="movie" value="http://g.hatena.ne.jp/tools/flvplayer.swf" />
+<param name="quality" value="high" />
+<param name="bgcolor" value="#ffffff" />
+<param name="FlashVars" value="moviePath=%s" />
+<embed src="http://g.hatena.ne.jp/tools/flvplayer.swf" FlashVars="moviePath=%s" quality="high" bgcolor="#ffffff" width="320" height="205" name="flvplayer" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+</object>
+EOD
 
 __PACKAGE__->patterns([$pattern_useful, $pattern_simple]);
 
@@ -85,6 +111,10 @@ sub _parse_useful {
                        $str,
                        $url,
                    );
+    } elsif ($type =~ /^sound/i) {
+        return sprintf($tmpl_sound, $url, $url, $url);
+    } elsif ($type =~ /^movie/i) {
+        return sprintf($tmpl_movie, $url, $url);
     }
 }
 
