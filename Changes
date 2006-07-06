@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::Hatena.
 
+0.14  Thu Jul 6
+	- Changed ASIN.publisher to ASIN.Manufacturer
+
 0.13  Tue Jun 6
         - Fixed problem with null line in pre node.
 	- Added movie/sound syntax to Text::Hatena::AutoLink::HTTP.

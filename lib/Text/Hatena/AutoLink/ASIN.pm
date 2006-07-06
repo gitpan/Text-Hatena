@@ -15,7 +15,7 @@ my $detail_template = <<'END';
   <ul>
     [% IF property.artists %]<li><span class="hatena-asin-detail-label">アーティスト:</span> [% FOREACH artist = property.artists %]<a href="[% keyword_url %][% artist | utf8off | enword %]" class="keyword">[% artist | utf8off | html %]</a> [% END %]</li>[% END %]
     [% IF property.authors %]<li><span class="hatena-asin-detail-label">作者:</span> [% FOREACH author = property.authors %]<a href="[% keyword_url %][% author | utf8off | enword %]" class="keyword">[% author | utf8off | html %]</a> [% END %]</li>[% END %]
-    [% IF property.publisher %]<li><span class="hatena-asin-detail-label">出版社/メーカー:</span> <a href="[% keyword_url %][% property.publisher | utf8off | enword %]" class="keyword">[% property.publisher | utf8off | html %]</a></li>[% END %]
+    [% IF property.Manufacturer %]<li><span class="hatena-asin-detail-label">出版社/メーカー:</span> <a href="[% keyword_url %][% property.Manufacturer | utf8off | enword %]" class="keyword">[% property.Manufacturer | utf8off | html %]</a></li>[% END %]
     [% IF property.ReleaseDate %]<li><span class="hatena-asin-detail-label">発売日:</span> [% property.ReleaseDate | utf8off | html %]</li>[% END %]
     <li><span class="hatena-asin-detail-label">メディア:</span> [% property.Media | utf8off | html %]</li>
   </ul>
