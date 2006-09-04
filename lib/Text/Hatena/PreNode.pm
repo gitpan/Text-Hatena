@@ -13,23 +13,32 @@ sub init {
 sub parse {
     my $self = shift;
     my $c = $self->{context};
-    $c->nextline =~ /$self->{pattern}/ or return;
+    $self->check_syntax($c->nextline) or return;
     $c->shiftline;
     my $t = "\t" x $self->{ilevel};
     $c->htmllines($t.$self->{startstring});
-    my $x = '';
+    my @r;
     while ($c->hasnext) {
         my $l = $c->nextline;
         if ($l =~ /$self->{endpattern}/) {
-	    $x = $` || '';
+            push @r, $` || '';
             $c->shiftline;
             last;
         }
-        $c->htmllines($self->escape_pre($c->shiftline));
+        push @r, $c->shiftline || '';
     }
-    $c->htmllines($x . $self->{endstring});
+    my $r = $self->format(join"\n", @r);
+    chomp $r;
+    $c->htmllines($r);
+    $c->htmllines($self->{endstring});
 }
 
-sub escape_pre { $_[1] }
+sub check_syntax {
+    my $self = shift;
+    my $line = shift or return;
+    return $line =~ /$self->{pattern}/;
+}
+
+sub format { $_[1] }
 
 1;

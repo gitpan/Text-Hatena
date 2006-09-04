@@ -5,7 +5,7 @@ use Text::Hatena::BodyNode;
 #use Text::Hatena::FootnoteNode;
 use Text::Hatena::HTMLFilter;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub new {
     my $class = shift;

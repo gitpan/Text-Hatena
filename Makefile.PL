@@ -8,6 +8,7 @@ WriteMakefile(
         Net::Amazon => 0.34,
         Template => 2.14,
         LWP::UserAgent => 2.0,
+        Text::VimColor => 0.11,
     },
     ($] >= 5.005 ?
       (ABSTRACT_FROM  => 'lib/Text/Hatena.pm',

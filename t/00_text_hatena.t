@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 18;
+use Test::More tests => 20;
 BEGIN { use_ok('Text::Hatena') };
 
 my $base = 'http://d.hatena.ne.jp/jkondo/';
@@ -262,6 +262,48 @@ html starts with &lt;html&gt;.
 END
 chomp $html2;
 
+is ($html, $html2);
+
+# superpre(vimcolor)
+$text = <<'END';
+>|perl|
+#!/usr/bin/perl -w
+use strict;
+
+my $s = "Hello, World!";
+print $s; # prints Hello, World!
+||<
+END
+
+$p->parse($text);
+$html = $p->html;
+$html2 = <<'END';
+<div class="section">
+	<pre class="hatena-super-pre">
+<span class="synPreProc">#!/usr/bin/perl -w</span>
+<span class="synStatement">use strict</span>;
+
+<span class="synStatement">my</span> <span class="synIdentifier">$s</span> = <span class="synConstant">&quot;Hello, World!&quot;</span>;
+<span class="synStatement">print</span> <span class="synIdentifier">$s</span>; <span class="synComment"># prints Hello, World!</span>
+</pre>
+</div>
+END
+chomp $html2;
+is ($html, $html2);
+
+# superpre(vimcolor auto detect)
+$text = <<'END';
+>|?|
+#!/usr/bin/perl -w
+use strict;
+
+my $s = "Hello, World!";
+print $s; # prints Hello, World!
+||<
+END
+
+$p->parse($text);
+$html = $p->html;
 is ($html, $html2);
 
 # table

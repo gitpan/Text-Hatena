@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::Hatena.
 
+0.15  Mon Sep 4
+	- Added Text::VimColor extension to SuperPreNode.
+
 0.14  Thu Jul 6
 	- Changed ASIN.publisher to ASIN.Manufacturer
 
