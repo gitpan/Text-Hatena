@@ -36,6 +36,7 @@ lib/Text/Hatena/Context.pm
 lib/Text/Hatena/DlNode.pm
 lib/Text/Hatena/FootnoteNode.pm
 lib/Text/Hatena/H3Node.pm
+lib/Text/Hatena/H3anchorNode.pm
 lib/Text/Hatena/H4Node.pm
 lib/Text/Hatena/H5Node.pm
 lib/Text/Hatena/ListNode.pm

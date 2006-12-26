@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 20;
+use Test::More tests => 22;
 BEGIN { use_ok('Text::Hatena') };
 
 my $base = 'http://d.hatena.ne.jp/jkondo/';
@@ -36,17 +36,20 @@ chomp $html2;
 is ($html, $html2);
 
 # h3time
+my $time = 1234567890;
 $text = <<END;
-*1234567890*record time
+*$time*record time
 remember time.
 END
 
 $p->parse($text);
 $html = $p->html;
+my $m = sprintf('%02d', (localtime($time))[1]);
+my $h = sprintf('%02d', (localtime($time))[2]);
 
 $html2 = <<END;
 <div class="section">
-	<h3><a href="http://d.hatena.ne.jp/jkondo/20050906#1234567890" name="1234567890"><span class="sanchor">sa</span></a> record time</h3> <span class="timestamp">08:31</span>
+	<h3><a href="http://d.hatena.ne.jp/jkondo/20050906#1234567890" name="1234567890"><span class="sanchor">sa</span></a> record time</h3> <span class="timestamp">$h:$m</span>
 	<p>remember time.</p>
 </div>
 END
@@ -268,7 +271,6 @@ is ($html, $html2);
 $text = <<'END';
 >|perl|
 #!/usr/bin/perl -w
-use strict;
 
 my $s = "Hello, World!";
 print $s; # prints Hello, World!
@@ -281,7 +283,6 @@ $html2 = <<'END';
 <div class="section">
 	<pre class="hatena-super-pre">
 <span class="synPreProc">#!/usr/bin/perl -w</span>
-<span class="synStatement">use strict</span>;
 
 <span class="synStatement">my</span> <span class="synIdentifier">$s</span> = <span class="synConstant">&quot;Hello, World!&quot;</span>;
 <span class="synStatement">print</span> <span class="synIdentifier">$s</span>; <span class="synComment"># prints Hello, World!</span>
@@ -295,7 +296,6 @@ is ($html, $html2);
 $text = <<'END';
 >|?|
 #!/usr/bin/perl -w
-use strict;
 
 my $s = "Hello, World!";
 print $s; # prints Hello, World!
@@ -400,6 +400,49 @@ END
 
 $p->parse($text);
 $html = $p->html;
+chomp $html2;
+is ($html, $html2);
+
+# plain h3
+$p = Text::Hatena->new(
+    ilevel => 0,
+    invalidnode => [qw(h3anchor)],
+);
+
+$text = <<END;
+*h3title
+
+h3body
+END
+
+$p->parse($text);
+$html = $p->html;
+$html2 = <<END;
+<div class="section">
+	<h3>h3title</h3>
+	
+	<p>h3body</p>
+</div>
+END
+chomp $html2;
+is ($html, $html2);
+
+# plain section
+$p = Text::Hatena->new(
+    ilevel => 0,
+    invalidnode => [qw(section)],
+);
+$text = <<END;
+This is plain paragraph without any section nodes.
+Is it right?
+END
+
+$p->parse($text);
+$html = $p->html;
+$html2 = <<END;
+	<p>This is plain paragraph without any section nodes.</p>
+	<p>Is it right?</p>
+END
 chomp $html2;
 is ($html, $html2);
 

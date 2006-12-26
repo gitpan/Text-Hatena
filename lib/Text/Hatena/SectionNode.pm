@@ -2,6 +2,7 @@ package Text::Hatena::SectionNode;
 use strict;
 use base qw(Text::Hatena::Node);
 use Text::Hatena::H3Node;
+use Text::Hatena::H3anchorNode;
 use Text::Hatena::H4Node;
 use Text::Hatena::H5Node;
 use Text::Hatena::BlockquoteNode;
@@ -18,7 +19,7 @@ use Text::Hatena::CDataNode;
 
 sub init {
     my $self = shift;
-    $self->{childnode} = [qw(h5 h4 h3 blockquote dl list superpre pre table tagline tag)];
+    $self->{childnode} = [qw(h5 h4 h3 h3anchor blockquote dl list superpre pre table tagline tag)];
     $self->{startstring} = qq|<div class="section">|;
     $self->{endstring} = qq|</div>|;
 }
@@ -28,7 +29,8 @@ sub parse {
     my $c = $self->{context};
     my $t = "\t" x $self->{ilevel};
     $self->_set_child_node_refs;
-    $c->htmllines($t.$self->{startstring});
+    $c->htmllines($t.$self->{startstring}) unless
+        (exists $self->{invalid_nodes}->{section});
     while ($c->hasnext) {
         my $l = $c->nextline;
         my $node = $self->_findnode($l) or last;
@@ -37,7 +39,8 @@ sub parse {
         }
         $node->parse;
     }
-    $c->htmllines($t.$self->{endstring});
+    $c->htmllines($t.$self->{endstring}) unless
+        (exists $self->{invalid_nodes}->{section});
 }
 
 sub _set_child_node_refs {
@@ -49,6 +52,13 @@ sub _set_child_node_refs {
     );
     my %invalid;
     @invalid{@{$c->invalidnode}} = () if @{$c->invalidnode};
+    if (exists $invalid{h3anchor}) {
+        # allow invalid{h3}
+    } elsif (!exists $invalid{h3anchor} && !exists $invalid{h3}) {
+        # prioritize h3anchor
+        $invalid{h3} = 1;
+    }
+    $self->{invalid_nodes} = \%invalid;
     for my $node (@{$self->{childnode}}) {
         next if exists $invalid{$node};
         my $mod = 'Text::Hatena::' . ucfirst($node) . 'Node';
