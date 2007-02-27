@@ -1,95 +1,298 @@
 package Text::Hatena;
 use strict;
-use Text::Hatena::Context;
-use Text::Hatena::BodyNode;
-#use Text::Hatena::FootnoteNode;
-use Text::Hatena::HTMLFilter;
+use warnings;
+use Carp;
+use base qw(Class::Data::Inheritable);
+use vars qw($VERSION);
+use Parse::RecDescent;
+use Text::Hatena::AutoLink;
 
-our $VERSION = '0.16';
+$VERSION = '0.20';
 
-sub new {
-    my $class = shift;
-    my %args = @_;
-    my $self = {
-        html => '',
-        baseuri => $args{baseuri} || '',
-        permalink => $args{permalink} || '',
-        ilevel => $args{ilevel} || 0, # level of default indent
-        invalidnode => $args{invalidnode} || [],
-        sectionanchor => $args{sectionanchor} || 'o-',
-	texthandler => $args{texthandler} || sub {
-	    my ($text, $c, $hp) = @_;
-            return $text if ($hp->in_anchor || $hp->in_superpre);
-	    my $p = $c->permalink;
-            my $al;
-            unless ($al = $c->autolink) {
-                # cache instance
-                use Text::Hatena::AutoLink;
-                my $a = Text::Hatena::AutoLink->new(%{$args{autolink_option}});
-                $c->autolink($a);
-                $al = $a;
-            }
-            $text = $al->parse($text, {
-                in_paragraph => $hp->in_paragraph,
-            });
-# 	    $text =~ s!
-# 		\(\((.+?)\)\)
-# 	    !
-#                 my ($note,$pre,$post) = ($1,$`,$');
-#                 if ($pre =~ /\)$/ && $post =~ /^\(/) {
-#                     "(($note))";
-#                 } else {
-#                     my $notes = $c->footnotes($note);
-#                     my $num = $#$notes + 1;
-#                     $note =~ s/<.*?>//g;
-#                     $note =~ s/\&/\&amp\;/g;
-#                     qq|<span class="footnote"><a href="$p#f$num" title="$note" name="fn$num">*$num</a></span>|;
-#                 }
-# 	    !egox;
-	    return $text;
-	},
-    };
-    bless $self, $class;
-}
+my ($parser, $syntax);
+
+__PACKAGE__->mk_classdata('syntax');
+
+#$::RD_HINT = 1;
+#$::RD_TRACE = 1;
+#$::RD_WARN = undef;
+$Parse::RecDescent::skip = '';
+$syntax = q(
+    body       : section(s)
+    section    : h3(?) block(s?)
+    # Block Elements
+    block      : h5
+               | h4
+               | blockquote
+               | dl
+               | list
+               | super_pre
+               | pre
+               | table
+               | cdata
+               | p
+    h3         : "\n*" inline(s)
+    h4         : "\n**" inline(s)
+    h5         : "\n***" inline(s)
+    blockquote : "\n>" http(?) ">" block(s) "\n<<" ..."\n"
+    dl         : dl_item(s)
+    dl_item    : "\n:" inline[term => ':'](s) ':' inline(s)
+    list       : list_item[level => $arg{level} || 1](s)
+    list_item  : "\n" /[+-]{$arg{level}}/ inline(s) list[level => $arg{level} + 1](?)
+    super_pre  : /\n>\|(\w*)\|/o text_line(s) "\n||<" ..."\n"
+    text_line  : ...!"\n||<\n" "\n" /[^\n]*/o
+    pre        : "\n>|" pre_line(s) "\n|<" ..."\n"
+    pre_line   : ...!"\n|<" "\n" inline(s?)
+    table      : table_row(s)
+    table_row  : "\n|" td(s /\|/) '|'
+    td         : /\*?/o inline[term => '\|'](s)
+    cdata      : "\n><" /.+?(?=><\n)/so "><" ..."\n"
+    p          : ...!p_terminal "\n" inline(s?)
+    p_terminal : h3 | "\n<<\n"
+    # Inline Elements
+    inline     : /[^\n$arg{term}]+/
+    http       : /https?:\/\/[A-Za-z0-9~\/._\?\&=\-%#\+:\;,\@\']+(?::title=[^\]]+)?/
+);
 
 sub parse {
-    my $self = shift;
+    my $class = shift;
     my $text = shift or return;
-    $self->{context} = Text::Hatena::Context->new(
-        text => $text,
-        baseuri => $self->{baseuri},
-        permalink => $self->{permalink},
-        invalidnode => $self->{invalidnode},
-        sectionanchor => $self->{sectionanchor},
-	texthandler => $self->{texthandler},
-    );
-    my $c = $self->{context};
-    my $node = Text::Hatena::BodyNode->new(
-        context => $c,
-        ilevel => $self->{ilevel},
-    );
-    $node->parse;
-    my $parser = Text::Hatena::HTMLFilter->new(
-	context => $c,
-    );
-    $parser->parse($c->html);
-    $self->{html} = $parser->html;
+    $text =~ s/\r//g;
+    $text = "\n" . $text unless $text =~ /^\n/;
+    $text .= "\n" unless $text =~ /\n$/;
+    my $node = shift || 'body';
+    my $html = $class->parser->$node($text);
+#    warn $html;
+    return $html;
+}
 
-    if (@{$c->footnotes}) {
-        my $node = Text::Hatena::FootnoteNode->new(
-            context => $c,
-            ilevel => $self->{ilevel},
-        );
-        $node->parse;
-	$self->{html} .= "\n";
-	$self->{html} .= $node->html;
+sub parser {
+    my $class = shift;
+    unless (defined $parser) {
+         $::RD_AUTOACTION = q|my $method = shift @item;| .
+             $class . q|->$method({items => \@item});|;
+        $parser = Parse::RecDescent->new($syntax);
+        if ($class->syntax) {
+            $parser->Replace($class->syntax);
+        }
+    }
+    return $parser;
+}
+
+sub expand {
+    my $class = shift;
+    my $array = shift or return;
+    ref($array) eq 'ARRAY' or return;
+    my $ret = '';
+    while (my $item = shift @$array) {
+        if (ref($item) eq 'ARRAY') {
+            my $c = $class->expand($item);
+            $ret .= $c if $c;
+        } else {
+            $ret .= $item if $item;
+        }
+    }
+    return $ret;
+}
+
+# Nodes
+# Block Nodes
+sub abstract {
+    my $class = shift;
+    my $items = shift->{items};
+    return $class->expand($items);
+}
+
+*body = \&abstract;
+*block = \&abstract;
+*line = \&abstract;
+
+sub section {
+    my $class = shift;
+    my $items = shift->{items};
+    my $body = $class->expand($items) || '';
+    $body =~ s/\n\n$/\n/;
+    return $body ? qq|<div class="section">\n| . $body . qq|</div>\n| : '';
+}
+
+sub h3 {
+    my $class = shift;
+    my $items = shift->{items};
+    my $title = $class->expand($items->[1]);
+    return if $title =~ /^\*/;
+    return "<h3>$title</h3>\n";
+}
+
+sub h4 {
+    my $class = shift;
+    my $items = shift->{items};
+    my $title = $class->expand($items->[1]);
+    return if $title =~ /^\*/;
+    return "<h4>$title</h4>\n";
+}
+
+sub h5 {
+    my $class = shift;
+    my $items = shift->{items};
+    my $title = $class->expand($items->[1]);
+    return "<h5>$title</h5>\n";
+}
+
+sub blockquote {
+    my $class = shift;
+    my $items = shift->{items};
+    my $body = $class->expand($items->[3]);
+    my $http = $items->[1]->[0];
+    my $ret = '';
+    if ($http) {
+        $ret = qq|<blockquote title="$http->{title}" cite="$http->{cite}">\n|;
+    } else {
+        $ret = "<blockquote>\n";
+    }
+    $ret .= $body;
+    if ($http) {
+        $ret .= qq|<cite><a href="$http->{cite}">$http->{title}</a></cite>\n|;
+    }
+    $ret .= "</blockquote>\n";
+    return $ret;
+}
+
+sub bq_block {
+    my $class = shift;
+    my $items = shift->{items};
+    return $class->expand($items->[0]);
+}
+
+sub dl {
+    my $class = shift;
+    my $items = shift->{items};
+    my $list = $class->expand($items->[0]);
+    return "<dl>\n$list</dl>\n";
+}
+
+sub dl_item {
+    my $class = shift;
+    my $items = shift->{items};
+    my $dt = $class->expand($items->[1]);
+    my $dd = $class->expand($items->[3]);
+    return "<dt>$dt</dt>\n<dd>$dd</dd>\n";
+}
+
+sub dt {
+    my $class = shift;
+    my $items = shift->{items};
+    my $dt = $class->expand($items->[1]);
+    return "<dt>$dt</dt>\n";
+}
+
+sub list {
+    my $class = shift;
+    my $items = shift->{items};
+    my ($list,$tag);
+    for my $li (@{$items->[0]}) {
+        $tag ||= $li =~ /^\-/ ? 'ul' : 'ol';
+        $li =~ s/^[+-]+//;
+        $list .= $li;
+    }
+    return "<$tag>\n$list</$tag>\n";
+}
+
+sub list_item {
+    my $class = shift;
+    my $items = shift->{items};
+    my $li = $class->expand($items->[2]);
+    my $sl = $class->expand($items->[3]) || '';
+    $sl = "\n" . $sl if $sl;
+    return $items->[1] . "<li>$li$sl</li>\n";
+}
+
+sub super_pre {
+    my $class = shift;
+    my $items = shift->{items};
+    my $filter = $1 || ''; # todo
+    my $texts = $class->expand($items->[1]);
+    return "<pre>\n$texts</pre>\n";
+}
+
+sub pre {
+    my $class = shift;
+    my $items = shift->{items};
+    my $lines = $class->expand($items->[1]);
+    return "<pre>\n$lines</pre>\n";
+}
+
+sub pre_line {
+    my $class = shift;
+    my $items = shift->{items};
+    my $inlines = $class->expand($items->[2]);
+    return "$inlines\n";
+}
+
+sub table {
+    my $class = shift;
+    my $items = shift->{items};
+    my $trs = $class->expand($items->[0]);
+    return "<table>\n$trs</table>\n";
+}
+
+sub table_row { # we can't use tr!
+    my $class = shift;
+    my $items = shift->{items};
+    my $tds = $class->expand($items->[1]);
+    return "<tr>\n$tds</tr>\n";
+}
+
+sub td {
+    my $class = shift;
+    my $items = shift->{items};
+    my $tag = $items->[0] ? 'th' : 'td';
+    my $inlines = $class->expand($items->[1]);
+    return "<$tag>$inlines</$tag>\n";
+}
+
+sub cdata {
+    my $class = shift;
+    my $items = shift->{items};
+    my $data = $items->[1];
+    return "<$data>\n";
+}
+
+sub p {
+    my $class = shift;
+    my $items = shift->{items};
+    my $inlines = $class->expand($items->[2]);
+    return $inlines ? "<p>$inlines</p>\n" : "\n";
+}
+
+sub text_line {
+    my $class = shift;
+    my $text = shift->{items}->[2];
+    return "$text\n";
+}
+
+# Inline Nodes
+sub inline {
+    my $class = shift;
+    my $items = shift->{items};
+    my $item = $items->[0] or return;
+    $item = Text::Hatena::AutoLink->parse($item);
+    return $item;
+}
+
+sub http {
+    my $class = shift;
+    my $items = shift->{items};
+    my $item = $items->[0] or return;
+    $item =~ s/:title=([^\]]+)$//;
+    my $title = $1 || $item;
+    return {
+        cite => $item,
+        title => $title,
     }
 }
 
-sub html { $_[0]->{html}; }
-
-
 1;
+
 __END__
 
 =head1 NAME
@@ -100,19 +303,25 @@ Text::Hatena - Perl extension for formatting text with Hatena Style.
 
   use Text::Hatena;
 
-  my $parser = Text::Hatena->new(
-    permalink => 'http://www.example.com/entry/123',
-  );
-  $parser->parse($text);
-  my $html = $parser->html;
+  my $html = Text::Hatena->parse($text);
 
 =head1 DESCRIPTION
 
 Text::Hatena parses text with Hatena Style and generates html string.
-Hatena Style is a set of text syntax which is originally used in 
+Hatena Style is a set of text syntax which is originally used in
 Hatena Diary (http://d.hatena.ne.jp/).
 
 You can get html string from simple text with syntax like Wiki.
+
+=over 4
+
+=item Incompatibility at version 0.20
+
+All codes were rewritten at version 0.20 and some functions were removed.
+API for parsing text were changed too. Please be careful to upgrade your
+Text::Hatena to version 0.20+.
+
+=back
 
 =head1 METHODS
 
@@ -120,47 +329,11 @@ Here are common methods of Text::Hatena.
 
 =over 4
 
-=item new
-
-  $parser = Text::Hatena->new;
-  $parser = Text::Hatena->new(
-    permalink => 'http://www.example.com/entry/123',
-    ilevel => 1,
-    invalidnode => [qw(h4 h5)],
-    sectionanchor => '@',
-    autolink_option => {
-      a_target => '_blank',
-      scheme_option => {
-        id => {
-          a_target => '',
-        },
-      ),
-    },
-  );
-
-creates an instance of Text::Hatena.
-
-C<permalink> is the uri of your document. It is used in H3 section anchor.
-
-C<ilevel> is the base indent level.
-
-C<invalidnode> is an array reference of invalid nodes. The node in the array will be skipped.
-
-C<sectionanchor> is the string of H3 section anchor.
-
-C<autolink_option> are the options for L<Text::Hatena::AutoLink>.
-
 =item parse
 
-  $parser->parse($text);
+  my $html = $parser->parse($text);
 
-parses text and generates html.
-
-=item html
-
-  $html = $parser->html;
-
-returns html string generated.
+parses text and returns html string.
 
 =back
 
@@ -188,12 +361,9 @@ To stop generating paragraphs automatically, start a line with >< (greater-than 
 
 =item Headlines
 
-To create a section headline, start a line with a star followed by an anchor, a star, some tags of categories and a section title. An anchor and tags are optional. If you omit an anchor, Text::Hatena generates it automatically.
+To create a section headline, start a line with a star followed by an anchor, a star, some tags of categories and a section title.
 
   *A line with a star becomes section headline
-  *sa*You can specify a string for anchor name
-  *[foo][bar]You can specify some tags of categories
-  *sa*[foo][bar]You can mix them
 
 More stars mean deeper levels of headlines. You can use up to three stars for headlines.
 
@@ -257,19 +427,17 @@ To encode special characters into HTML entities, use >|| and ||< for >| and |<. 
 
 =head1 SEE ALSO
 
-L<Text::Hatena::AutoLink>
 http://d.hatena.ne.jp/ (Japanese)
 
 =head1 AUTHOR
 
 Junya Kondo, E<lt>jkondo@hatena.ne.jpE<gt>
-id:tociyuki, E<lt>http://d.hatena.ne.jp/tociyuki/E<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 by Junya Kondo
+Copyright (C) Hatena Inc. All Rights Reserved.
 
-This library is free software; you can redistribute it and/or modify
+This library is free software; you may redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut

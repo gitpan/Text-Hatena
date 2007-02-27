@@ -4,11 +4,7 @@ NAME
 SYNOPSIS
       use Text::Hatena;
 
-      my $parser = Text::Hatena->new(
-        permalink => 'http://www.example.com/entry/123',
-      );
-      $parser->parse($text);
-      my $html = $parser->html;
+      my $html = Text::Hatena->parse($text);
 
 DESCRIPTION
     Text::Hatena parses text with Hatena Style and generates html string.
@@ -17,49 +13,18 @@ DESCRIPTION
 
     You can get html string from simple text with syntax like Wiki.
 
+    Incompatibility at version 0.20
+        All codes were rewritten at version 0.20 and some functions were
+        removed. API for parsing text were changed too. Please be careful to
+        upgrade your Text::Hatena to version 0.20+.
+
 METHODS
     Here are common methods of Text::Hatena.
 
-    new
-          $parser = Text::Hatena->new;
-          $parser = Text::Hatena->new(
-            permalink => 'http://www.example.com/entry/123',
-            ilevel => 1,
-            invalidnode => [qw(h4 h5)],
-            sectionanchor => '@',
-            autolink_option => {
-              a_target => '_blank',
-              scheme_option => {
-                id => {
-                  a_target => '',
-                },
-              ),
-            },
-          );
-
-        creates an instance of Text::Hatena.
-
-        "permalink" is the uri of your document. It is used in H3 section
-        anchor.
-
-        "ilevel" is the base indent level.
-
-        "invalidnode" is an array reference of invalid nodes. The node in
-        the array will be skipped.
-
-        "sectionanchor" is the string of H3 section anchor.
-
-        "autolink_option" are the options for Text::Hatena::AutoLink.
-
     parse
-          $parser->parse($text);
+          my $html = $parser->parse($text);
 
-        parses text and generates html.
-
-    html
-          $html = $parser->html;
-
-        returns html string generated.
+        parses text and returns html string.
 
 Text::Hatena Syntax
     Text::Hatena supports some simple markup language, which is similar to
@@ -89,14 +54,9 @@ Text::Hatena Syntax
 
     Headlines
         To create a section headline, start a line with a star followed by
-        an anchor, a star, some tags of categories and a section title. An
-        anchor and tags are optional. If you omit an anchor, Text::Hatena
-        generates it automatically.
+        an anchor, a star, some tags of categories and a section title.
 
           *A line with a star becomes section headline
-          *sa*You can specify a string for anchor name
-          *[foo][bar]You can specify some tags of categories
-          *sa*[foo][bar]You can mix them
 
         More stars mean deeper levels of headlines. You can use up to three
         stars for headlines.
@@ -171,15 +131,14 @@ Text::Hatena Syntax
           ||<
 
 SEE ALSO
-    Text::Hatena::AutoLink http://d.hatena.ne.jp/ (Japanese)
+    http://d.hatena.ne.jp/ (Japanese)
 
 AUTHOR
-    Junya Kondo, <jkondo@hatena.ne.jp> id:tociyuki,
-    <http://d.hatena.ne.jp/tociyuki/>
+    Junya Kondo, <jkondo@hatena.ne.jp>
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2005 by Junya Kondo
+    Copyright (C) Hatena Inc. All Rights Reserved.
 
-    This library is free software; you can redistribute it and/or modify it
+    This library is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 

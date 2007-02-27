@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::Hatena.
 
+0.20  Tue Feb 6 2007
+	- Rewrite whole code using Parse::RecDescent
+	- Changed whole architecture
+
 0.16  Mon Dec 25
 	- Added H3anchorNode and invalid option for H3anchor.
 	- Added Invalid option for section node.
